@@ -1629,7 +1629,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   <div class="source">Sources: [participant], [assumption]</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s13" class="nav-btn nav-btn-secondary">← Back</label>
-    <label for="s15" class="nav-btn nav-btn-primary">Next: Timeline →</label>
+    <label for="s15" class="nav-btn nav-btn-primary">Next →</label>
   </div>
 </div>
 
@@ -1689,7 +1689,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   <div class="source">Sources: [participant]</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s14" class="nav-btn nav-btn-secondary">← Back</label>
-    <label for="s16" class="nav-btn nav-btn-primary">Next: Risks →</label>
+    <label for="s16" class="nav-btn nav-btn-primary">Next →</label>
   </div>
 </div>
 
@@ -1758,7 +1758,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   <div class="source">Sources: [participant], [Manager Online transit labor reports], [APC Sensor Studies]</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s15" class="nav-btn nav-btn-secondary">← Back</label>
-    <label for="s17" class="nav-btn nav-btn-primary">Next: Assumptions & Decisions →</label>
+    <label for="s17" class="nav-btn nav-btn-primary">Next →</label>
   </div>
 </div>
 
@@ -1816,7 +1816,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   <div class="source">Sources: [participant], [user selection], [assumption]</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s16" class="nav-btn nav-btn-secondary">← Back</label>
-    <label for="s18" class="nav-btn nav-btn-primary">Next: Final Verdict →</label>
+    <label for="s18" class="nav-btn nav-btn-primary">Next →</label>
   </div>
 </div>
 
@@ -1897,6 +1897,22 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 (function(){
  var explore=document.getElementById("explore-full-project");
  if(explore){explore.addEventListener("click",function(e){e.preventDefault();document.body.classList.add("presentation-open");document.getElementById("full-project").scrollTop=0;history.pushState({view:"presentation"},"", "#full-project");});}
+
+ document.addEventListener("keydown",function(event){
+   if(!document.body.classList.contains("presentation-open")) return;
+   if(event.altKey||event.ctrlKey||event.metaKey||event.shiftKey) return;
+   var target=event.target;
+   if(target&&(/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(target.tagName)||target.isContentEditable)) return;
+   if(event.key!=="ArrowLeft"&&event.key!=="ArrowRight") return;
+   var current=document.querySelector("#full-project input[name=slide]:checked");
+   if(!current) return;
+   var slideNumber=parseInt(current.id.slice(1),10);
+   var nextNumber=event.key==="ArrowRight"?Math.min(18,slideNumber+1):Math.max(1,slideNumber-1);
+   if(nextNumber===slideNumber) return;
+   event.preventDefault();
+   var nextRadio=document.getElementById("s"+nextNumber);
+   if(nextRadio) nextRadio.checked=true;
+ });
  window.addEventListener("popstate",function(event){document.body.classList.remove("presentation-open");});
 })();
 </script>
