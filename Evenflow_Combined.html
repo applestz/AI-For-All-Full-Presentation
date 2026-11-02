@@ -1,0 +1,1921 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evenflow — moodengs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --sky-light: #e3f2fd; --sky-mid: #bbdefb;
+      --blue-primary: #64b5f6; --blue-deep: #1565c0;
+      --blue-dark: #0d47a1; --blue-accent: #42a5f5;
+      --blue-bright: #1e88e5;
+      --bus-body: #64b5f6; --bus-dark: #1e88e5; --bus-window: #e1f5fe;
+      --road-color: #546e7a; --road-line: #fdd835;
+      --text-dark: #0d1b2a; --text-light: #546e7a; --white: #ffffff;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+    html { scroll-behavior: auto; }
+    body {
+      font-family: var(--font-body);
+      background: var(--sky-light);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* NAV DOTS */
+    .nav-dots {
+      position: fixed; right: 24px; top: 50%;
+      transform: translateY(-50%); z-index: 100;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .nav-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 2px solid var(--blue-deep); background: transparent;
+      cursor: pointer; transition: all 0.3s; display: block;
+    }
+    .nav-dot.active { background: var(--blue-deep); transform: scale(1.3); }
+
+    /* SHARED */
+    .scene { position: relative; width: 100%; overflow: hidden; }
+    .btn {
+      padding: 14px 32px; border-radius: 50px;
+      font-family: var(--font-display); font-size: 15px;
+      font-weight: 600; cursor: pointer; text-decoration: none;
+      transition: all 0.3s; display: inline-flex;
+      align-items: center; gap: 8px;
+    }
+    .btn-primary {
+      background: var(--blue-deep); color: var(--white); border: none;
+      box-shadow: 0 4px 20px rgba(21,101,192,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(21,101,192,0.4); }
+    .btn-outline { background: transparent; color: var(--blue-deep); border: 2px solid var(--blue-deep); }
+    .btn-outline:hover { background: var(--blue-deep); color: var(--white); }
+    .highlight { color: var(--blue-deep); font-weight: 600; }
+
+    /* SCENE 1: HERO */
+    .scene-hero {
+      height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: linear-gradient(180deg, #bbdefb 0%, #e3f2fd 40%, #e8f5e9 90%, #c8e6c9 100%);
+    }
+    .clouds { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; }
+    .cloud { position: absolute; background: rgba(255,255,255,0.7); border-radius: 100px; filter: blur(1px); }
+    .cloud::before, .cloud::after { content: ''; position: absolute; background: inherit; border-radius: 50%; }
+    .cloud-1 { width: 200px; height: 50px; top: 10%; left: -10%; }
+    .cloud-1::before { width: 80px; height: 80px; top: -40px; left: 30px; }
+    .cloud-1::after { width: 100px; height: 70px; top: -30px; left: 80px; }
+    .cloud-2 { width: 160px; height: 40px; top: 20%; right: -5%; }
+    .cloud-2::before { width: 60px; height: 60px; top: -30px; left: 20px; }
+    .cloud-2::after { width: 80px; height: 55px; top: -25px; left: 60px; }
+    .cloud-3 { width: 240px; height: 55px; top: 8%; left: 40%; }
+    .cloud-3::before { width: 90px; height: 90px; top: -45px; left: 50px; }
+    .cloud-3::after { width: 110px; height: 75px; top: -35px; left: 110px; }
+    .hero-content { position: relative; z-index: 10; text-align: center; }
+    .team-name {
+      font-family: var(--font-body); font-size: 14px; font-weight: 600;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--blue-deep); opacity: 0; margin-bottom: 16px;
+    }
+    .brand-title {
+      font-family: var(--font-display); font-size: clamp(64px, 12vw, 140px);
+      font-weight: 700; color: var(--blue-dark); line-height: 1;
+      margin-bottom: 16px; overflow: hidden;
+    }
+    .brand-title .char { display: inline-block; opacity: 0; transform: translateY(100%); }
+    .tagline {
+      font-size: clamp(16px, 2.5vw, 22px); color: var(--text-light);
+      font-weight: 400; max-width: 600px; margin: 0 auto 12px;
+      opacity: 0; line-height: 1.6;
+    }
+    .tagline-thai {
+      font-size: clamp(14px, 2vw, 17px); color: var(--blue-deep);
+      font-weight: 500; opacity: 0; margin-bottom: 32px;
+    }
+    .hero-buttons { display: flex; gap: 16px; justify-content: center; opacity: 0; flex-wrap: wrap; }
+    .scroll-hint {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center;
+      gap: 8px; opacity: 0; z-index: 10;
+    }
+    .scroll-hint span { font-size: 12px; color: var(--text-light); letter-spacing: 0.15em; text-transform: uppercase; }
+    .scroll-line { width: 1px; height: 40px; background: var(--blue-deep); animation: scroll-pulse 2s ease infinite; }
+    @keyframes scroll-pulse {
+      0%, 100% { transform: scaleY(1); opacity: 1; }
+      50% { transform: scaleY(0.4); opacity: 0.3; }
+    }
+    .hero-bus { position: absolute; bottom: 48px; right: 5%; z-index: 5; width: 280px; height: 140px; }
+    .skyline { position: absolute; bottom: 0; left: 0; width: 100%; height: 200px; pointer-events: none; z-index: 2; }
+
+    /* SCENE 2: EXPLANATION — longer scroll for hold */
+    .scene-explanation {
+      height: 500vh;
+      position: relative;
+      background: linear-gradient(180deg, #e8f5e9 0%, #e3f2fd 20%, var(--white) 100%);
+    }
+    .explanation-pin { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; align-items: center; }
+    .explanation-bus { position: absolute; left: 80%; bottom: 76px; width: 320px; z-index: 10; }
+    .road { position: absolute; bottom: 0; width: 100%; height: 80px; background: var(--road-color); z-index: 1; }
+    .road::before {
+      content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 4px;
+      background: repeating-linear-gradient(90deg, var(--road-line) 0, var(--road-line) 40px, transparent 40px, transparent 80px);
+      transform: translateY(-50%);
+    }
+    .buildings-bg { position: absolute; bottom: 80px; left: 0; width: 200%; height: 300px; z-index: 0; }
+    .explanation-text {
+      position: absolute; right: 8%; top: 40%; transform: translateY(-50%);
+      max-width: 480px; z-index: 5; opacity: 0;
+    }
+    .explanation-text h2 {
+      font-family: var(--font-display); font-size: clamp(28px, 4vw, 48px);
+      font-weight: 700; color: var(--blue-dark); line-height: 1.2; margin-bottom: 20px;
+    }
+    .explanation-text p { font-size: 17px; color: var(--text-light); line-height: 1.7; }
+
+    /* SCENE 3: IMPACT */
+    .scene-impact { height: 400vh; position: relative; background: var(--white); }
+    .impact-pin {
+      position: sticky; top: 0; height: 100vh; width: 100%;
+      overflow: hidden; display: flex; align-items: center; justify-content: center;
+    }
+    .impact-bus { position: absolute; left: 12%; bottom: 25%; z-index: 10; width: 320px; }
+    .passengers { position: absolute; right: -200px; bottom: 28%; z-index: 15; display: flex; gap: 20px; }
+    .person { width: 30px; display: flex; flex-direction: column; align-items: center; opacity: 0; }
+    .person-head { width: 20px; height: 20px; border-radius: 50%; }
+    .person-body { width: 16px; height: 30px; border-radius: 8px 8px 4px 4px; margin-top: 2px; }
+    .person-legs { display: flex; gap: 4px; margin-top: 1px; }
+    .person-leg { width: 6px; height: 18px; border-radius: 3px; }
+    .person-red .person-head, .person-red .person-body { background: #ef5350; }
+    .person-red .person-leg { background: #c62828; }
+    .person-blue .person-head, .person-blue .person-body { background: #42a5f5; }
+    .person-blue .person-leg { background: #1565c0; }
+    .person-green .person-head, .person-green .person-body { background: #66bb6a; }
+    .person-green .person-leg { background: #2e7d32; }
+    .person-orange .person-head, .person-orange .person-body { background: #ffa726; }
+    .person-orange .person-leg { background: #e65100; }
+    .person-purple .person-head, .person-purple .person-body { background: #ab47bc; }
+    .person-purple .person-leg { background: #6a1b9a; }
+    .person-gray .person-head, .person-gray .person-body { background: #78909c; }
+    .person-gray .person-leg { background: #37474f; }
+
+    /* Impact text — white card */
+    .impact-text {
+      position: absolute; right: 6%; top: 50%; transform: translateY(-50%);
+      max-width: 440px; z-index: 20; opacity: 0;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+      border-radius: 20px; padding: 36px 32px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+    }
+    .impact-text h2 {
+      font-family: var(--font-display); font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700; color: var(--blue-dark); line-height: 1.2; margin-bottom: 20px;
+    }
+    .impact-text p { font-size: 17px; color: var(--text-light); line-height: 1.7; }
+
+    /* Stats */
+    .stats-row {
+      position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 20px; z-index: 20; opacity: 0;
+    }
+    .stat-box {
+      background: var(--blue-deep); border-radius: 16px; padding: 24px 32px;
+      text-align: center; min-width: 180px;
+      box-shadow: 0 8px 32px rgba(21,101,192,0.25);
+    }
+    .stat-number { font-family: var(--font-display); font-size: 42px; font-weight: 700; color: var(--white); }
+    .stat-label { font-size: 13px; color: rgba(255,255,255,0.85); margin-top: 6px; line-height: 1.4; }
+
+    /* SCENE 4: CTA */
+    .scene-cta {
+      height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, var(--white) 0%, #e3f2fd 50%, #bbdefb 100%);
+      position: relative;
+    }
+    .cta-content { text-align: center; z-index: 10; opacity: 0; }
+    .cta-content h2 {
+      font-family: var(--font-display); font-size: clamp(32px, 5vw, 56px);
+      font-weight: 700; color: var(--blue-dark); margin-bottom: 16px;
+    }
+    .cta-content p {
+      font-size: 18px; color: var(--text-light); margin-bottom: 36px;
+      max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.6;
+    }
+    .btn-cta {
+      padding: 18px 48px; font-size: 18px; border-radius: 60px;
+      background: var(--blue-deep); color: var(--white); border: none;
+      font-family: var(--font-display); font-weight: 600; cursor: pointer;
+      box-shadow: 0 8px 32px rgba(21,101,192,0.35);
+      transition: all 0.3s; text-decoration: none; display: inline-block;
+    }
+    .btn-cta:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 40px rgba(21,101,192,0.45); }
+
+    /* BUS SVG */
+    .bus-body-fill { fill: var(--bus-body); }
+    .bus-roof-fill { fill: var(--blue-accent); }
+    .bus-bottom-fill { fill: var(--bus-dark); }
+    .bus-stripe-fill { fill: #1e88e5; }
+    .bus-bumper-fill { fill: #455a64; }
+    .bus-window-fill { fill: var(--bus-window); stroke: #90caf9; stroke-width: 1.5; }
+    .bus-door-fill { fill: #bbdefb; stroke: #90caf9; stroke-width: 1.5; }
+    .bus-wheel-fill { fill: #37474f; }
+    .bus-wheel-hub { fill: #78909c; }
+    .bus-light-front { fill: #fff9c4; }
+    .bus-light-rear { fill: #ef5350; }
+    .bus-mirror-fill { fill: #90a4ae; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .explanation-text, .impact-text { right: 5%; left: 5%; max-width: 100%; }
+      .stats-row { flex-wrap: wrap; gap: 12px; }
+      .stat-box { min-width: 140px; padding: 16px 20px; }
+      .stat-number { font-size: 32px; }
+      .hero-buttons { flex-direction: column; align-items: center; }
+    }
+  </style>
+
+<style id="embedded-presentation-styles">
+/* Embedded presentation styles, isolated from the landing page */
+body.presentation-open { overflow: hidden; }
+body.presentation-open > :not(#full-project) { display: none !important; }
+body.presentation-open #full-project { display: block; position: fixed; inset: 0; z-index: 1000; overflow: auto; }
+#full-project {
+  display: none;
+  --bg:#f9f9f9; --card:#fff; --accent:#0f62fe; --accent-light:#e8f0fe;
+  --text:#111; --text-secondary:#555; --text-muted:#888; --border:#e2e2e2;
+  --green:#15803d; --red:#dc2626; --amber:#d97706; --purple:#7c3aed;
+  min-height:100vh; padding:24px 24px 88px; background:#f9f9f9; color:#111;
+  font-family:system-ui,-apple-system,sans-serif; font-size:14px; line-height:1.5;
+}
+#full-project input[type="radio"] { display:none; }
+
+#full-project * { margin: 0; padding: 0; box-sizing: border-box; }
+#full-project {
+    background: var(--bg);
+    font-family: system-ui, -apple-system, sans-serif;
+    color: var(--text);
+    line-height: 1.5;
+  }
+#full-project .slide {
+    min-height: 100vh;
+    padding: 48px 32px;
+    max-width: 960px;
+    margin: 0 auto;
+    display: none;
+  }
+#full-project .slide-num {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+#full-project h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+#full-project h2 { font-size: 22px; font-weight: 600; margin-bottom: 16px; color: var(--text); }
+#full-project h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-secondary); }
+#full-project .subtitle { font-size: 16px; color: var(--text-secondary); margin-bottom: 24px; }
+#full-project .pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+#full-project .pill-accent { background: var(--accent-light); color: var(--accent); }
+#full-project .pill-green { background: #dcfce7; color: var(--green); }
+#full-project .pill-red { background: #fee2e2; color: var(--red); }
+#full-project .pill-amber { background: #fef3c7; color: var(--amber); }
+#full-project .pill-purple { background: #ede9fe; color: var(--purple); }
+#full-project .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+#full-project .card-label {
+    color: var(--text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+#full-project .card-value {
+    font-size: 28px;
+    font-weight: 700;
+    font-family: 'SF Mono', 'Cascadia Code', monospace;
+    color: var(--text);
+  }
+#full-project .card-delta { font-size: 13px; margin-top: 2px; }
+#full-project .card-delta.positive { color: var(--green); }
+#full-project .card-delta.negative { color: var(--red); }
+#full-project .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+#full-project .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+#full-project .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+#full-project table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+#full-project th { text-align: left; color: var(--text-muted); font-weight: 500; padding: 8px 12px; border-bottom: 2px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+#full-project td { padding: 8px 12px; color: var(--text); border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+#full-project tr:hover td { background: #fafafa; }
+#full-project .bar-container { background: #f0f0f0; border-radius: 4px; height: 8px; margin-top: 4px; }
+#full-project .bar-fill { height: 8px; border-radius: 4px; }
+#full-project .bar-green { background: var(--green); }
+#full-project .bar-accent { background: var(--accent); }
+#full-project .source { font-size: 11px; color: var(--text-muted); margin-top: 16px; padding-top: 8px; border-top: 1px solid #f0f0f0; }
+#full-project .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+  }
+#full-project .nav-info { font-size: 13px; color: var(--text-muted); }
+#full-project .flow-step {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+#full-project .flow-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-right: 12px;
+    margin-top: 2px;
+  }
+#full-project .dot-blue { background: #dbeafe; }
+#full-project .dot-yellow { background: #fef3c7; }
+#full-project .dot-green { background: #dcfce7; }
+#full-project .dot-red { background: #fee2e2; }
+#full-project .dot-orange { background: #ffedd5; }
+#full-project .flow-content { flex: 1; }
+#full-project .flow-content strong { font-size: 13px; }
+#full-project .flow-content p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+#full-project .screen-frame {
+    background: var(--card);
+    border: 2px solid #222;
+    border-radius: 16px;
+    padding: 12px;
+    max-width: 340px;
+    margin: 0 auto 16px;
+  }
+#full-project .screen-header {
+    background: var(--accent);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px 8px 0 0;
+    font-size: 11px;
+    font-weight: 600;
+  }
+#full-project .screen-body {
+    padding: 12px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    min-height: 120px;
+  }
+#full-project .screen-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f5f5f5; }
+#full-project .screen-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+#full-project .timeline-item {
+    position: relative;
+    padding-left: 28px;
+    padding-bottom: 24px;
+    border-left: 2px solid var(--border);
+    margin-left: 8px;
+  }
+#full-project .timeline-item:last-child { border-left-color: transparent; }
+#full-project .timeline-dot {
+    position: absolute;
+    left: -7px;
+    top: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--card);
+  }
+#full-project .timeline-dot.done { background: var(--accent); }
+#full-project .highlight-box {
+    background: linear-gradient(135deg, #0f62fe08, #0f62fe12);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 16px;
+  }
+#full-project .verdict-box {
+    background: #dcfce7;
+    border: 2px solid var(--green);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+#full-project .verdict-box h2 { color: var(--green); margin-bottom: 8px; }
+#full-project input[type="radio"] { display: none; }
+#full-project input#s1:checked ~ .slide.s1,
+#full-project input#s2:checked ~ .slide.s2,
+#full-project input#s3:checked ~ .slide.s3,
+#full-project input#s4:checked ~ .slide.s4,
+#full-project input#s5:checked ~ .slide.s5,
+#full-project input#s6:checked ~ .slide.s6,
+#full-project input#s7:checked ~ .slide.s7,
+#full-project input#s8:checked ~ .slide.s8,
+#full-project input#s9:checked ~ .slide.s9,
+#full-project input#s10:checked ~ .slide.s10,
+#full-project input#s11:checked ~ .slide.s11,
+#full-project input#s12:checked ~ .slide.s12,
+#full-project input#s13:checked ~ .slide.s13,
+#full-project input#s14:checked ~ .slide.s14,
+#full-project input#s15:checked ~ .slide.s15,
+#full-project input#s16:checked ~ .slide.s16,
+#full-project input#s17:checked ~ .slide.s17,
+#full-project input#s18:checked ~ .slide.s18 { display: block; }
+#full-project .nav-btn {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+#full-project .nav-btn-primary { background: var(--accent); color: white; }
+#full-project .nav-btn-primary:hover { background: #0043ce; }
+#full-project .nav-btn-secondary { background: #f0f0f0; color: var(--text); }
+#full-project .nav-btn-secondary:hover { background: #e0e0e0; }
+#full-project .toc-item {
+    display: block;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s ease;
+    margin-bottom: 4px;
+  }
+#full-project .toc-item:hover { background: var(--accent-light); }
+#full-project .toc-num { color: var(--accent); font-weight: 700; margin-right: 8px; font-family: monospace; }
+#full-project .ribbon {
+    display: flex;
+    align-items: center;
+    background: #1a1a2e;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+#full-project .ribbon-stop {
+    text-align: center;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+  }
+#full-project .ribbon-stop-name { font-size: 9px; color: #aaa; margin-bottom: 4px; }
+#full-project .ribbon-stop-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #555;
+    margin: 0 auto 4px;
+  }
+#full-project .ribbon-bus {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    display: inline-block;
+  }
+#full-project .ribbon-line {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    right: 16px;
+    height: 2px;
+    background: #333;
+    z-index: 0;
+  }
+#full-project .ooscope-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: 13px;
+  }
+#full-project .ooscope-x {
+    color: var(--red);
+    font-weight: 700;
+    margin-right: 10px;
+    font-size: 16px;
+  }
+</style>
+
+</head>
+<body>
+  <!-- NAV DOTS -->
+  <nav class="nav-dots">
+    <span class="nav-dot active" data-target="scene-hero"></span>
+    <span class="nav-dot" data-target="scene-explanation"></span>
+    <span class="nav-dot" data-target="scene-impact"></span>
+    <span class="nav-dot" data-target="scene-cta"></span>
+  </nav>
+
+  <!-- BUS SVG SYMBOLS -->
+  <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="bus-standard" viewBox="0 0 320 160">
+      <rect class="bus-body-fill" x="20" y="30" width="280" height="85" rx="12"/>
+      <rect class="bus-roof-fill" x="20" y="25" width="280" height="15" rx="8"/>
+      <rect class="bus-bottom-fill" x="20" y="105" width="280" height="15" rx="4"/>
+      <rect class="bus-stripe-fill" x="20" y="95" width="280" height="12" rx="2"/>
+      <rect class="bus-bumper-fill" x="8" y="60" width="18" height="50" rx="6"/>
+      <circle class="bus-light-front" cx="14" cy="70" r="6"/>
+      <circle class="bus-light-rear" cx="14" cy="100" r="4"/>
+      <rect class="bus-mirror-fill" x="2" y="55" width="12" height="6" rx="3"/>
+      <rect class="bus-window-fill" x="45" y="40" width="35" height="35" rx="5"/>
+      <rect class="bus-window-fill" x="90" y="40" width="35" height="35" rx="5"/>
+      <rect class="bus-window-fill" x="135" y="40" width="35" height="35" rx="5"/>
+      <rect class="bus-window-fill" x="180" y="40" width="35" height="35" rx="5"/>
+      <rect class="bus-window-fill" x="225" y="40" width="35" height="35" rx="5"/>
+      <rect class="bus-door-fill" x="270" y="38" width="22" height="68" rx="4"/>
+      <line x1="281" y1="38" x2="281" y2="106" stroke="#90caf9" stroke-width="1.5"/>
+      <circle class="bus-wheel-fill" cx="75" cy="128" r="18"/>
+      <circle class="bus-wheel-hub" cx="75" cy="128" r="8"/>
+      <circle class="bus-wheel-fill" cx="245" cy="128" r="18"/>
+      <circle class="bus-wheel-hub" cx="245" cy="128" r="8"/>
+      <text x="160" y="90" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="16" font-weight="700" fill="#0d47a1">Evenflow</text>
+    </symbol>
+    <symbol id="bus-with-door" viewBox="0 0 320 160">
+      <rect class="bus-body-fill" x="20" y="30" width="280" height="85" rx="12"/>
+      <rect class="bus-roof-fill" x="20" y="25" width="280" height="15" rx="8"/>
+      <rect class="bus-bottom-fill" x="20" y="105" width="280" height="15" rx="4"/>
+      <rect class="bus-stripe-fill" x="20" y="95" width="280" height="12" rx="2"/>
+      <rect class="bus-bumper-fill" x="8" y="60" width="18" height="50" rx="6"/>
+      <circle class="bus-light-front" cx="14" cy="70" r="6"/>
+      <rect class="bus-window-fill" x="45" y="40" width="35" height="35" rx="5"/>
+      <rect class="bus-window-fill" x="90" y="40" width="35" height="35" rx="5"/>
+      <rect class="bus-window-fill" x="135" y="40" width="35" height="35" rx="5"/>
+      <rect class="bus-window-fill" x="180" y="40" width="35" height="35" rx="5"/>
+      <rect class="bus-window-fill" x="225" y="40" width="35" height="35" rx="5"/>
+      <g id="door-left"><rect class="bus-door-fill" x="270" y="38" width="11" height="68" rx="2"/></g>
+      <g id="door-right"><rect class="bus-door-fill" x="281" y="38" width="11" height="68" rx="2"/></g>
+      <circle class="bus-wheel-fill" cx="75" cy="128" r="18"/>
+      <circle class="bus-wheel-hub" cx="75" cy="128" r="8"/>
+      <circle class="bus-wheel-fill" cx="245" cy="128" r="18"/>
+      <circle class="bus-wheel-hub" cx="245" cy="128" r="8"/>
+      <text x="160" y="90" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="16" font-weight="700" fill="#0d47a1">Evenflow</text>
+    </symbol>
+  </svg>
+
+  <!-- SCENE 1: HERO -->
+  <section class="scene scene-hero" id="scene-hero">
+    <div class="clouds">
+      <div class="cloud cloud-1"></div>
+      <div class="cloud cloud-2"></div>
+      <div class="cloud cloud-3"></div>
+    </div>
+    <div class="hero-content">
+      <p class="team-name" id="teamName">moodengs</p>
+      <h1 class="brand-title" id="brandTitle"></h1>
+      <p class="tagline" id="tagline">Better bus spacing starts at the depot.</p>
+      <p class="tagline-thai" id="taglineThai">AI-assisted departure planning for depot dispatchers — นายท่า</p>
+      <div class="hero-buttons" id="heroButtons">
+        <a href="#scene-explanation" class="btn btn-primary">More information ↓</a>
+        <a href="https://ai-forall-eight.vercel.app/" target="_blank" class="btn btn-outline">Explore prototype ↗</a>
+      </div>
+    </div>
+    <div class="hero-bus">
+      <svg xmlns="http://www.w3.org/2000/svg"><use href="#bus-standard"/></svg>
+    </div>
+    <svg class="skyline" viewBox="0 0 1440 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="160" width="1440" height="40" fill="#a5d6a7"/>
+      <rect x="0" y="150" width="1440" height="15" fill="#546e7a" rx="2"/>
+      <rect x="50" y="60" width="60" height="100" rx="3" fill="#b0bec5"/>
+      <rect x="220" y="40" width="70" height="120" rx="3" fill="#b0bec5"/>
+      <rect x="420" y="50" width="65" height="110" rx="3" fill="#b0bec5"/>
+      <rect x="600" y="55" width="75" height="105" rx="3" fill="#90a4ae"/>
+      <rect x="800" y="45" width="80" height="115" rx="3" fill="#b0bec5"/>
+      <rect x="1010" y="50" width="70" height="110" rx="3" fill="#90a4ae"/>
+      <rect x="1200" y="55" width="65" height="105" rx="3" fill="#b0bec5"/>
+    </svg>
+    <div class="scroll-hint" id="scrollHint">
+      <span>Scroll to explore</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- SCENE 2: EXPLANATION -->
+  <section class="scene scene-explanation" id="scene-explanation">
+    <div class="explanation-pin">
+      <div class="buildings-bg" id="buildingsBg">
+        <svg width="100%" height="300" viewBox="0 0 2000 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="50" y="40" width="80" height="260" rx="4" fill="#cfd8dc" opacity="0.5"/>
+          <rect x="300" y="20" width="90" height="280" rx="4" fill="#cfd8dc" opacity="0.5"/>
+          <rect x="560" y="30" width="85" height="270" rx="4" fill="#b0bec5" opacity="0.5"/>
+          <rect x="820" y="45" width="95" height="255" rx="4" fill="#cfd8dc" opacity="0.5"/>
+          <rect x="1100" y="25" width="88" height="275" rx="4" fill="#b0bec5" opacity="0.5"/>
+          <rect x="1360" y="35" width="80" height="265" rx="4" fill="#cfd8dc" opacity="0.5"/>
+          <rect x="1650" y="40" width="70" height="260" rx="4" fill="#b0bec5" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="road"></div>
+      <div class="explanation-bus" id="explanationBus">
+        <svg xmlns="http://www.w3.org/2000/svg"><use href="#bus-standard"/></svg>
+      </div>
+      <div class="explanation-text" id="explanationText">
+        <h2>The right departure<br>makes a difference.</h2>
+        <p>Evenflow brings together <span class="highlight">live vehicle locations</span> and <span class="highlight">onboard passenger counts from overhead AI cameras</span> to recommend when buses should leave the depot.</p>
+        <br>
+        <p>The dispatcher — <span class="highlight">นายท่า</span> — stays in control.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <style>
+    .stat-number {
+      display: flex; align-items: center; justify-content: center;
+      height: 52px; overflow: visible;
+    }
+    .digit-roller { display: inline-block; width: 0.55em; height: 52px; overflow: hidden; position: relative; }
+    .digit-strip { display: flex; flex-direction: column; will-change: transform; }
+    .digit-strip span {
+      font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 700;
+      color: #ffffff; height: 52px; display: flex; align-items: center;
+      justify-content: center; line-height: 1;
+    }
+    .stat-suffix {
+      font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 700;
+      color: #ffffff; line-height: 1; height: 52px; display: flex; align-items: center;
+    }
+    @media (max-width: 768px) {
+      .stat-number { height: 42px; }
+      .digit-roller { height: 42px; }
+      .digit-strip span, .stat-suffix { font-size: 32px; height: 42px; }
+    }
+  </style>
+
+  <!-- SCENE 3: IMPACT -->
+  <section class="scene scene-impact" id="scene-impact">
+    <div class="impact-pin">
+      <svg class="bus-stop-bg"
+           style="position:absolute;inset:0;width:100%;height:100%;z-index:1"
+           viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice"
+           xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e3f2fd"/>
+            <stop offset="70%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#f5f5f5"/>
+          </linearGradient>
+        </defs>
+        <rect width="1440" height="900" fill="url(#skyGrad)"/>
+        <rect x="60" y="280" width="90" height="300" rx="4" fill="#cfd8dc" opacity="0.35"/>
+        <rect x="180" y="240" width="110" height="340" rx="4" fill="#b0bec5" opacity="0.35"/>
+        <rect x="320" y="260" width="80" height="320" rx="4" fill="#cfd8dc" opacity="0.35"/>
+        <rect x="900" y="250" width="100" height="330" rx="4" fill="#b0bec5" opacity="0.35"/>
+        <rect x="1040" y="270" width="85" height="310" rx="4" fill="#cfd8dc" opacity="0.35"/>
+        <rect x="1180" y="290" width="75" height="290" rx="4" fill="#b0bec5" opacity="0.35"/>
+        <rect x="1300" y="260" width="95" height="320" rx="4" fill="#cfd8dc" opacity="0.35"/>
+        <circle cx="500" cy="490" r="45" fill="#a5d6a7" opacity="0.55"/>
+        <rect x="494" y="525" width="12" height="55" rx="4" fill="#795548" opacity="0.45"/>
+        <circle cx="850" cy="480" r="50" fill="#81c784" opacity="0.55"/>
+        <rect x="844" y="520" width="12" height="60" rx="4" fill="#795548" opacity="0.45"/>
+        <circle cx="1250" cy="495" r="40" fill="#a5d6a7" opacity="0.5"/>
+        <rect x="1244" y="525" width="12" height="50" rx="4" fill="#795548" opacity="0.4"/>
+        <rect x="0" y="620" width="1440" height="50" fill="#e0e0e0"/>
+        <rect x="0" y="618" width="1440" height="5" fill="#bdbdbd"/>
+        <rect x="0" y="670" width="1440" height="140" fill="#546e7a"/>
+        <line x1="0" y1="740" x2="1440" y2="740" stroke="#fdd835" stroke-width="5" stroke-dasharray="50 35"/>
+        <line x1="0" y1="675" x2="1440" y2="675" stroke="#78909c" stroke-width="2"/>
+        <line x1="0" y1="805" x2="1440" y2="805" stroke="#78909c" stroke-width="2"/>
+        <rect x="0" y="810" width="1440" height="90" fill="#c8e6c9"/>
+        <!-- Bus stop — centered in left half -->
+        <rect x="250" y="430" width="240" height="12" rx="4" fill="#78909c"/>
+        <rect x="265" y="442" width="8" height="178" fill="#90a4ae"/>
+        <rect x="472" y="442" width="8" height="178" fill="#90a4ae"/>
+        <rect x="273" y="452" width="199" height="150" rx="5" fill="#bbdefb" opacity="0.3" stroke="#90caf9" stroke-width="1.5"/>
+        <rect x="255" y="452" width="18" height="150" rx="3" fill="#bbdefb" opacity="0.2" stroke="#90caf9" stroke-width="1"/>
+        <rect x="290" y="580" width="165" height="10" rx="4" fill="#8d6e63"/>
+        <rect x="298" y="590" width="8" height="25" rx="3" fill="#795548"/>
+        <rect x="440" y="590" width="8" height="25" rx="3" fill="#795548"/>
+        <rect x="210" y="410" width="8" height="210" fill="#546e7a"/>
+        <rect x="190" y="395" width="48" height="48" rx="8" fill="#1565c0"/>
+        <text x="214" y="426" text-anchor="middle" font-family="Inter, sans-serif" font-size="24" font-weight="700" fill="#ffffff">B</text>
+        <rect x="193" y="448" width="42" height="22" rx="3" fill="#ffffff"/>
+        <text x="214" y="464" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#1565c0">BUS</text>
+        <rect x="510" y="590" width="22" height="28" rx="4" fill="#90a4ae"/>
+        <rect x="507" y="586" width="28" height="6" rx="3" fill="#78909c"/>
+      </svg>
+
+      <div class="impact-bus" id="impactBus">
+        <svg xmlns="http://www.w3.org/2000/svg"><use href="#bus-with-door"/></svg>
+      </div>
+
+      <div class="passengers" id="passengers">
+        <div class="person person-red"><div class="person-head"></div><div class="person-body"></div><div class="person-legs"><div class="person-leg"></div><div class="person-leg"></div></div></div>
+        <div class="person person-blue"><div class="person-head"></div><div class="person-body"></div><div class="person-legs"><div class="person-leg"></div><div class="person-leg"></div></div></div>
+        <div class="person person-green"><div class="person-head"></div><div class="person-body"></div><div class="person-legs"><div class="person-leg"></div><div class="person-leg"></div></div></div>
+        <div class="person person-orange"><div class="person-head"></div><div class="person-body"></div><div class="person-legs"><div class="person-leg"></div><div class="person-leg"></div></div></div>
+        <div class="person person-purple"><div class="person-head"></div><div class="person-body"></div><div class="person-legs"><div class="person-leg"></div><div class="person-leg"></div></div></div>
+        <div class="person person-gray"><div class="person-head"></div><div class="person-body"></div><div class="person-legs"><div class="person-leg"></div><div class="person-leg"></div></div></div>
+      </div>
+
+      <div class="impact-text" id="impactText">
+        <h2>Less bunching.<br>More regular journeys.</h2>
+        <p>Designed to reduce service gaps and overcrowding — without asking passengers to download another app.</p>
+      </div>
+
+      <div class="stats-row" id="statsRow">
+        <div class="stat-box">
+          <div class="stat-number" id="statRuns"></div>
+          <div class="stat-label">simulation runs<br>verified</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number" id="statDisrupted"></div>
+          <div class="stat-label">passengers<br>disrupted</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number" id="statWarning"></div>
+          <div class="stat-label">early<br>warning</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 4: CTA -->
+  <section class="scene scene-cta" id="scene-cta">
+    <div class="cta-content" id="ctaContent">
+      <h2>See what drives Evenflow.</h2>
+      <p>Explore the thinking, technology, and evidence behind the project.</p>
+      <a href="#full-project" class="btn-cta" id="explore-full-project">Explore the full project →</a>
+    </div>
+  </section>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* NAV DOTS */
+    document.querySelectorAll('.nav-dot').forEach(function (dot) {
+      dot.addEventListener('click', function () {
+        var target = document.getElementById(dot.dataset.target);
+        target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+    function updateActiveNavDot(activeIndex) {
+      document.querySelectorAll('.nav-dot').forEach(function (dot, index) {
+        dot.classList.toggle('active', index === activeIndex);
+      });
+    }
+
+    /* TEXT SPLIT */
+    function splitTextIntoChars(element, text) {
+      element.innerHTML = '';
+      for (var i = 0; i < text.length; i++) {
+        var span = document.createElement('span');
+        span.classList.add('char');
+        span.textContent = text[i] === ' ' ? '\u00A0' : text[i];
+        span.style.transitionDelay = (i * 0.04) + 's';
+        element.appendChild(span);
+      }
+    }
+
+    /* BUILD ROLLING DIGITS */
+    function buildRollingDigits(elementId, targetText) {
+      var element = document.getElementById(elementId);
+      element.innerHTML = '';
+      var digitHeight = window.innerWidth <= 768 ? 42 : 52;
+      var strips = [];
+      for (var i = 0; i < targetText.length; i++) {
+        var char = targetText[i];
+        if (isNaN(parseInt(char))) {
+          var suffix = document.createElement('span');
+          suffix.className = 'stat-suffix';
+          suffix.textContent = char;
+          suffix.style.opacity = '0';
+          element.appendChild(suffix);
+          strips.push({ type: 'suffix', element: suffix });
+          continue;
+        }
+        var targetDigit = parseInt(char);
+        var roller = document.createElement('div');
+        roller.className = 'digit-roller';
+        var strip = document.createElement('div');
+        strip.className = 'digit-strip';
+        for (var cycle = 0; cycle < 3; cycle++) {
+          for (var d = 0; d <= 9; d++) {
+            var digitSpan = document.createElement('span');
+            digitSpan.textContent = d;
+            strip.appendChild(digitSpan);
+          }
+        }
+        roller.appendChild(strip);
+        element.appendChild(roller);
+        var targetPosition = 20 + targetDigit;
+        var targetY = -(targetPosition * digitHeight);
+        strips.push({ type: 'digit', element: strip, targetY: targetY, index: i });
+      }
+      return strips;
+    }
+
+    /* ADD ROLLING TO TIMELINE */
+    function addRollingToTimeline(timeline, strips, startTime) {
+      for (var s = 0; s < strips.length; s++) {
+        var item = strips[s];
+        if (item.type === 'digit') {
+          timeline.fromTo(item.element,
+            { y: 0 },
+            { y: item.targetY, duration: 1.0 + (item.index * 0.15), ease: 'power3.out' },
+            startTime + (item.index * 0.08)
+          );
+        } else if (item.type === 'suffix') {
+          timeline.fromTo(item.element,
+            { opacity: 0 }, { opacity: 1, duration: 0.3 },
+            startTime + 0.8
+          );
+        }
+      }
+    }
+
+    /* START — no preloader */
+    (function startAnimations() {
+      var brandTitle = document.getElementById('brandTitle');
+      splitTextIntoChars(brandTitle, 'Evenflow');
+
+      /* SCENE 1 */
+      var heroTimeline = gsap.timeline({ delay: 0.2 });
+      heroTimeline
+        .to('#teamName',    { opacity: 1, duration: 0.6, ease: 'power2.out' })
+        .to('.char',        { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, ease: 'back.out(1.7)' }, '-=0.3')
+        .to('#tagline',     { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.2')
+        .to('#taglineThai', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+        .to('#heroButtons', { opacity: 1, duration: 0.5, ease: 'power2.out' }, '-=0.2')
+        .to('#scrollHint',  { opacity: 1, duration: 0.5 }, '-=0.3');
+
+      gsap.to('.cloud-1', { x: 80, duration: 25, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      gsap.to('.cloud-2', { x: -60, duration: 20, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      gsap.to('.cloud-3', { x: 50, duration: 30, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+
+      ScrollTrigger.create({
+        trigger: '#scene-hero', start: 'top top', end: 'bottom top',
+        onUpdate: function (self) { if (self.progress < 0.5) updateActiveNavDot(0); }
+      });
+      gsap.to('.hero-content', {
+        y: -100, opacity: 0,
+        scrollTrigger: { trigger: '#scene-hero', start: '60% top', end: 'bottom top', scrub: 1 }
+      });
+
+      /* SCENE 2 — animation uses 50% of scroll, remaining 50% = hold */
+      var explanationTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: '#scene-explanation', start: 'top top', end: '50% bottom',
+          scrub: 1, pin: '.explanation-pin',
+          onUpdate: function (self) { if (self.progress > 0.1) updateActiveNavDot(1); }
+        }
+      });
+      explanationTimeline
+        .fromTo('#explanationBus', { left: '70%' }, { left: '5%', duration: 3, ease: 'none' })
+        .fromTo('#buildingsBg', { x: 0 }, { x: -300, duration: 3, ease: 'none' }, 0)
+        .fromTo('#explanationText', { opacity: 0, x: 80 }, { opacity: 1, x: 0, duration: 1.5, ease: 'power2.out' }, 1)
+        .fromTo('#explanationText h2', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.5, ease: 'power3.out' }, 1.2)
+        .fromTo('#explanationText p', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1, stagger: 0.3, ease: 'power2.out' }, 1.8);
+
+      /* SCENE 3 */
+      var runsStrips    = buildRollingDigits('statRuns',      '840');
+      var disruptStrips = buildRollingDigits('statDisrupted', '0%');
+      var warningStrips = buildRollingDigits('statWarning',   '516s');
+
+      var impactTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: '#scene-impact', start: 'top top', end: '85% bottom',
+          scrub: 1, pin: '.impact-pin',
+          onUpdate: function (self) { if (self.progress > 0.1) updateActiveNavDot(2); }
+        }
+      });
+      impactTimeline
+        .fromTo('#impactBus', { x: -400, opacity: 0 }, { x: 0, opacity: 1, duration: 1.2, ease: 'power2.out' })
+        .to('#door-left',  { x: -12, duration: 0.4, ease: 'power2.inOut' }, 1.2)
+        .to('#door-right', { x: 12,  duration: 0.4, ease: 'power2.inOut' }, 1.2)
+        .fromTo('#passengers', { right: '-200px' }, { right: '35%', duration: 2, ease: 'power1.inOut' }, 1.4)
+        .to('.person', { opacity: 1, duration: 0.25, stagger: 0.12, ease: 'power2.out' }, 1.4)
+        .fromTo('#impactText', { opacity: 0, x: 100 }, { opacity: 1, x: 0, duration: 1, ease: 'power2.out' }, 2.0)
+        .fromTo('#impactText h2', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1, ease: 'power3.out' }, 2.2)
+        .fromTo('#impactText p', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 2.8)
+        .to('.person-red',    { x: -150, opacity: 0, duration: 0.4, ease: 'power2.in' }, 3.0)
+        .to('.person-blue',   { x: -150, opacity: 0, duration: 0.4, ease: 'power2.in' }, 3.2)
+        .to('.person-green',  { x: -150, opacity: 0, duration: 0.4, ease: 'power2.in' }, 3.4)
+        .to('.person-orange', { x: -150, opacity: 0, duration: 0.4, ease: 'power2.in' }, 3.6)
+        .to('.person-purple', { x: -150, opacity: 0, duration: 0.4, ease: 'power2.in' }, 3.8)
+        .to('.person-gray',   { x: -150, opacity: 0, duration: 0.4, ease: 'power2.in' }, 4.0)
+        .fromTo('#statsRow', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 4.2);
+
+      addRollingToTimeline(impactTimeline, runsStrips,    4.3);
+      addRollingToTimeline(impactTimeline, disruptStrips, 4.4);
+      addRollingToTimeline(impactTimeline, warningStrips, 4.5);
+      impactTimeline.to('#statsRow', { opacity: 1, duration: 2.5 }, 6.0);
+
+      /* SCENE 4 */
+      gsap.fromTo('#ctaContent',
+        { opacity: 0, y: 60 },
+        {
+          opacity: 1, y: 0, duration: 1, ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '#scene-cta', start: 'top 80%', end: 'top 30%', scrub: 1,
+            onUpdate: function (self) { if (self.progress > 0.3) updateActiveNavDot(3); }
+          }
+        }
+      );
+    })();
+  </script>
+
+<section id="full-project" aria-label="Evenflow full project presentation">
+
+
+<input type="radio" name="slide" id="s1" checked>
+<input type="radio" name="slide" id="s2">
+<input type="radio" name="slide" id="s3">
+<input type="radio" name="slide" id="s4">
+<input type="radio" name="slide" id="s5">
+<input type="radio" name="slide" id="s6">
+<input type="radio" name="slide" id="s7">
+<input type="radio" name="slide" id="s8">
+<input type="radio" name="slide" id="s9">
+<input type="radio" name="slide" id="s10">
+<input type="radio" name="slide" id="s11">
+<input type="radio" name="slide" id="s12">
+<input type="radio" name="slide" id="s13">
+<input type="radio" name="slide" id="s14">
+<input type="radio" name="slide" id="s15">
+<input type="radio" name="slide" id="s16">
+<input type="radio" name="slide" id="s17">
+<input type="radio" name="slide" id="s18">
+
+<!-- SLIDE 1: Title / Overview -->
+<div class="slide s1">
+  <div class="slide-num">Slide 1 of 18 &middot; Overview</div>
+  <h1>🚍 Evenflow</h1>
+  <p class="subtitle">Real-Time AI Depot Dispatch & Headway Planning System</p>
+  <p style="font-size:14px; color:var(--text-secondary); margin-bottom:24px;">ระบบวางแผนและปรับตารางปล่อยรถเมล์จากอู่แบบเรียลไทม์สำหรับนายท่า</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-label">Pillar</div>
+      <div style="font-size:18px; font-weight:600;">🚍 Smart Mobility & Cities</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Project Type</div>
+      <div style="font-size:18px; font-weight:600;">New Product</div>
+      <div style="font-size:12px; color:var(--text-muted);">Working Prototype → 12-Week Depot Pilot</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">One-Line Vision</div>
+    <p style="font-size:15px;">An operational decision-support system for bus depot dispatchers ("นายท่า") that analyzes real-time vehicle GPS, 90° overhead Edge-AI passenger crowding counts, traffic/weather delays, and inbound turnaround times to recommend optimal depot departure schedules — preventing service gaps and reducing onboard crowding without any passenger-facing mobile app.</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="card" style="text-align:center;">
+      <div class="card-label">Owner</div>
+      <div style="font-size:16px; font-weight:600;">Bowornnan</div>
+      <div style="font-size:12px; color:var(--text-muted);">Solo Founder</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="card-label">Status</div>
+      <span class="pill pill-green">GO — Approved</span>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="card-label">Prototype</div>
+      <div style="font-size:12px; font-weight:600;">ai-forall-eight.vercel.app</div>
+      <div style="font-size:11px; color:var(--text-muted);">9 screens · 91/91 tests</div>
+    </div>
+  </div>
+
+  <div class="source">Sources: [participant], [user selection]</div>
+
+  <div style="margin-top:24px; text-align:center;">
+    <label for="s2" class="nav-btn nav-btn-primary">Start Presentation →</label>
+  </div>
+</div>
+
+<!-- SLIDE 2: Problem Statement -->
+<div class="slide s2">
+  <div class="slide-num">Slide 2 of 18 &middot; Problem Statement</div>
+  <h2>The Problem: Bus Bunching & Service Gaps</h2>
+
+  <div class="grid-2">
+    <div class="card" style="text-align:center;">
+      <div class="card-value" style="color:var(--red);">15–30+</div>
+      <div class="card-label">minute unpredictable service gaps</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="card-value" style="color:var(--red);">&lt;20%</div>
+      <div class="card-label">passenger satisfaction on wait-time predictability</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Root Cause Chain</h3>
+    <div class="flow-step">
+      <div class="flow-dot dot-blue">1</div>
+      <div class="flow-content">
+        <strong>Static Paper Timetables</strong>
+        <p>Dispatchers ("นายท่า") release buses on fixed clock intervals without real-time data</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-dot dot-yellow">2</div>
+      <div class="flow-content">
+        <strong>Crowding Dwell-Time Feedback Loop</strong>
+        <p>Delayed lead bus fills to &gt;85% capacity → boarding slows by 1.35× → dwells longer at every stop</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-dot dot-orange">3</div>
+      <div class="flow-content">
+        <strong>Trailing Bus Catches Up</strong>
+        <p>Next bus on fixed clock encounters cleared stops → catches lead bus → 2–3 buses bumper-to-bumper</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-dot dot-red">4</div>
+      <div class="flow-content">
+        <strong>25–35 Minute Gap Behind</strong>
+        <p>Passengers at downstream stops face long waits, then crush-loaded buses</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <strong>Why not mid-route holding?</strong> Our 840-run Digital Twin benchmark proved mid-route holding <em>worsened</em> Total Passenger Time by <strong>+652.83 person-seconds</strong>. The depot is the only intervention point with <strong>0% onboard passenger harm</strong>.
+  </div>
+
+  <div class="source">Sources: [TDRI & OTP public transit studies], [participant], [Drabicki et al. 2023], [Singapore LTA BSRF evaluations]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s1" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s3" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 3: Why the Depot Dispatcher -->
+<div class="slide s3">
+  <div class="slide-num">Slide 3 of 18 &middot; Problem Statement (cont.)</div>
+  <h2>Why the Depot Dispatcher ("นายท่า") Is the Single Intervention Point</h2>
+
+  <div class="card">
+    <h3>❌ Passenger Apps — Report the Problem After It Happens</h3>
+    <p style="font-size:13px; color:var(--text-secondary);">Commuters see 3 buses stuck together 4 km away followed by a 30-minute gap. Knowing the bus is bunched does not make it come faster. Fixing spacing requires acting at the supply source — before the bus enters the corridor.</p>
+  </div>
+
+  <div class="card">
+    <h3>❌ Traffic Signals — Outside Operator Control</h3>
+    <p style="font-size:13px; color:var(--text-secondary);">Major Bangkok intersections (Phaya Thai, Pratunam, Ratchaprasong) are manually held for 3–5+ minutes by traffic police. A bus operator cannot control police signal boxes.</p>
+  </div>
+
+  <div class="card" style="border-color:var(--green); border-width:2px;">
+    <h3>✅ Depot Departure — 100% Operator Control, 0% Passenger Harm</h3>
+    <p style="font-size:13px; color:var(--text-secondary);">840-run SHA-256 hash-verified benchmark: depot departure adjustment saved <strong>-660.00 person-seconds</strong> across <strong>30/30 disrupted seeds (100% consistency)</strong> with <strong>0% mid-route passenger harm</strong>.</p>
+  </div>
+
+  <div class="source">Sources: [participant], [TDRI & OTP public transit studies]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s2" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s4" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 4: Solution Summary -->
+<div class="slide s4">
+  <div class="slide-num">Slide 4 of 18 &middot; Solution Summary</div>
+  <h2>Evenflow: Three-Layer Innovation</h2>
+  <p class="subtitle">100% B2B/B2G Depot Dispatch Decision-Support — Zero Consumer App, Zero Street Hardware</p>
+
+  <div class="card">
+    <div style="display:flex; align-items:center; margin-bottom:8px;">
+      <span class="pill pill-accent">Layer 1</span>
+      <strong>Real-Time 90° Overhead Edge-AI Crowding Measurement</strong>
+    </div>
+    <p style="font-size:13px; color:var(--text-secondary);">YOLOv8-Nano + ByteTrack non-facial silhouette counting above bus doors. +In/-Out counts in volatile RAM. 100% PDPA-compliant, zero video storage. Bayesian Door-Dwell Cross-Check: 0.85 × CameraCount + 0.15 × ImpliedDwell.</p>
+  </div>
+
+  <div class="card">
+    <div style="display:flex; align-items:center; margin-bottom:8px;">
+      <span class="pill pill-purple">Layer 2</span>
+      <strong>8.6-Minute Early-Warning Predictor</strong>
+    </div>
+    <p style="font-size:13px; color:var(--text-secondary);">Forecasts downstream gaps (&gt;22 min), bunching (&lt;5 min), and overcrowding (&gt;85% load) <strong>516.17 seconds (~8.6 min)</strong> ahead with <strong>1.00 precision</strong> (zero false alarms) and 78.21s headway MAE. Applies 1.35× crowding dwell-inflation when cabin load exceeds 75%.</p>
+  </div>
+
+  <div class="card">
+    <div style="display:flex; align-items:center; margin-bottom:8px;">
+      <span class="pill pill-green">Layer 3</span>
+      <strong>Counterfactual Digital Twin Depot Optimizer</strong>
+    </div>
+    <p style="font-size:13px; color:var(--text-secondary);">Parallel Node.js Worker Threads (<strong>2.47 ms</strong> latency) simulate departure adjustments (-3 to +5 min) across 75%/100%/125% demand scenarios. Dispatcher approves with <strong>1-Click</strong>. Hard guardrails: Bus in Bay, EV SoC ≥ 35%, Driver Rest ≥ 6 min, No-Blame ค่าเที่ยว protection.</p>
+  </div>
+
+  <div class="source">Sources: [participant], [Drabicki et al. 2023], [Daganzo 2009]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s3" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s5" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 5: Verified Results -->
+<div class="slide s5">
+  <div class="slide-num">Slide 5 of 18 &middot; Solution Summary (cont.)</div>
+  <h2>Verified Results: 840 Simulation Runs</h2>
+
+  <div class="grid-4">
+    <div class="card" style="text-align:center;">
+      <div class="card-value" style="color:var(--green);">-660</div>
+      <div class="card-label">person-seconds saved per 30-min window</div>
+      <div class="card-delta positive">30/30 seeds · 100% win rate</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="card-value" style="color:var(--green);">-3.3%</div>
+      <div class="card-label">headway variance reduction</div>
+      <div class="card-delta positive">53,574 → 51,791</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="card-value" style="color:var(--accent);">1.00</div>
+      <div class="card-label">bunching precision</div>
+      <div class="card-delta">TP=60, FP=0</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="card-value" style="color:var(--green);">0%</div>
+      <div class="card-label">mid-route passenger harm</div>
+      <div class="card-delta positive">0/840 runs</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card" style="text-align:center;">
+      <div class="card-value">516.17s</div>
+      <div class="card-label">mean warning lead time (~8.6 min)</div>
+      <div class="card-delta">MAE: 78.21s</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="card-value">2.47ms</div>
+      <div class="card-label">Worker-Thread Digital Twin latency</div>
+      <div class="card-delta">Node.js parallel simulation</div>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <strong>SHA-256 Hash-Verified:</strong> 30 seeds × 7 traffic/demand scenarios × 4 policies = 840 deterministic runs. Every run reproducible via hash-matched random seeds.
+  </div>
+
+  <div class="source">Sources: [participant]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s4" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s6" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 6: Confirmed Parameters -->
+<div class="slide s6">
+  <div class="slide-num">Slide 6 of 18 &middot; Confirmed Parameters</div>
+  <h2>Confirmed Parameters</h2>
+
+  <table>
+    <thead><tr><th>Parameter</th><th>Specification</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Primary Persona</strong></td><td>Depot Dispatcher ("นายท่า")</td></tr>
+      <tr><td><strong>Target Boundary</strong></td><td>100% Depot Dispatchers & Fleet Managers — ZERO consumer app, ZERO street hardware</td></tr>
+      <tr><td><strong>Crowding Sensor</strong></td><td>90° Edge-AI Door Camera (YOLOv8-Nano + ByteTrack) + Bayesian Dwell — ZERO ticket/farebox</td></tr>
+      <tr><td><strong>Control Mechanism</strong></td><td>Depot Departure Optimization (-3 to +5 min) where 0 passengers are delayed</td></tr>
+      <tr><td><strong>Hard Guardrails</strong></td><td>Human 1-Click Approval, Kill Switch, Bus in Bay, EV SoC ≥ 35%, Driver Rest ≥ 6 min, No-Blame ค่าเที่ยว</td></tr>
+      <tr><td><strong>Critical Assumption</strong></td><td>Dispatchers will trust & adopt AI over paper timetables — risk accepted, validate via SC5 (≥70%)</td></tr>
+      <tr><td><strong>12-Week Pilot</strong></td><td>1 depot, 6–8 buses, &lt; ฿210,000 total budget</td></tr>
+      <tr><td><strong>Year 1 Target</strong></td><td>5–10 depots (150–300 buses)</td></tr>
+      <tr><td><strong>Year 3 Target</strong></td><td>30+ depots (1,000–1,500+ buses) at ฿1,200/bus/month SaaS</td></tr>
+    </tbody>
+  </table>
+
+  <div class="source">Sources: [participant], [user selection], [assumption]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s5" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s7" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 7: Competitive Landscape -->
+<div class="slide s7">
+  <div class="slide-num">Slide 7 of 18 &middot; Competitive Landscape</div>
+  <h2>5 Competitor Categories vs. Evenflow</h2>
+
+  <table>
+    <thead><tr><th>#</th><th>Category</th><th>Critical Thai Loophole</th><th>Evenflow Wins</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td><strong>Thai Depot Baseline</strong> (BMTA paper + DLT GPS)</td>
+        <td>Zero predictive lookahead; blind to crowding (no tap-out)</td>
+        <td>Edge-AI + 8.6-min predictor + Digital Twin</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td><strong>Thai Consumer Apps</strong> (ViaBus, TSB Go Plus)</td>
+        <td>Passive maps; show bunching after it happens</td>
+        <td>Fixes at supply source; no app needed</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td><strong>Regional Regulatory</strong> (Singapore LTA BSRF/EWT)</td>
+        <td>Mid-route holding harms passengers (+652.83 person-sec)</td>
+        <td>100% depot-side, 0% harm, -660 person-sec</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td><strong>Global SaaS</strong> (Swiftly, Optibus)</td>
+        <td>$150–300+/bus/mo; ignores Thai depot constraints</td>
+        <td>~80% lower TCO (฿1,200/bus/mo)</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td><strong>Legacy Sensors</strong> (Wi-Fi/BLE, IR beams)</td>
+        <td>70–80% MAC randomization error; IR drift</td>
+        <td>90° Edge-AI ≥95% accuracy, PDPA-compliant</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="card">
+    <h3>Build vs. Buy Decision</h3>
+    <div style="font-size:13px;">
+      <div style="margin-bottom:6px;"><span class="pill pill-red">Rejected</span> Buy Foreign SaaS + 3D APCs — ~5× higher USD cost, Thai workflow mismatch</div>
+      <div style="margin-bottom:6px;"><span class="pill pill-red">Rejected</span> Build From Scratch — 9–12 month delay</div>
+      <div><span class="pill pill-green">Selected</span> <strong>Deploy & Scale Evenflow Brownfield Core</strong> — 91/91 tests, 840-run verified, plug-and-play</div>
+    </div>
+  </div>
+
+  <div class="source">Sources: [TDRI & OTP], [web research], [Singapore LTA BSRF], [Swiftly & Optibus benchmarks], [APC Sensor Studies], [participant]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s6" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s8" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 8: Feasibility Assessment -->
+<div class="slide s8">
+  <div class="slide-num">Slide 8 of 18 &middot; Feasibility Assessment</div>
+  <h2>Feasibility: All 5 Dimensions — HIGH (GO)</h2>
+
+  <div class="card">
+    <table>
+      <thead><tr><th>Dimension</th><th>Rating</th><th>Confidence</th><th>Key Evidence</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Technical & Cloud</strong></td>
+          <td><span class="pill pill-green">HIGH</span></td>
+          <td style="font-family:monospace;">95%</td>
+          <td>91/91 tests (1.02s), 2.47ms latency, AWS IoT/Timestream/Fargate/Bedrock</td>
+        </tr>
+        <tr>
+          <td><strong>Data & Edge-AI Hardware</strong></td>
+          <td><span class="pill pill-green">HIGH</span></td>
+          <td style="font-family:monospace;">92%</td>
+          <td>Zero permits needed; DLT GPS + OSRM + Open-Meteo + 9–36V cameras</td>
+        </tr>
+        <tr>
+          <td><strong>Algorithmic & AI Safety</strong></td>
+          <td><span class="pill pill-green">HIGH</span></td>
+          <td style="font-family:monospace;">95%</td>
+          <td>840-run verified: 1.00 precision, 516.17s lead, 0% harm</td>
+        </tr>
+        <tr>
+          <td><strong>Operational, Labor & PDPA</strong></td>
+          <td><span class="pill pill-green">HIGH</span></td>
+          <td style="font-family:monospace;">93%</td>
+          <td>Human-in-the-loop, ≥6 min rest lock, No-Blame, Kill Switch, zero PII</td>
+        </tr>
+        <tr>
+          <td><strong>Budget & Timeline</strong></td>
+          <td><span class="pill pill-green">HIGH</span></td>
+          <td style="font-family:monospace;">95%</td>
+          <td>&lt;฿210k pilot; ฿1,200/bus/mo SaaS (~80% cheaper than Western)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="border-color:var(--amber);">
+    <h3>⚠️ Biggest Constraint</h3>
+    <p style="font-size:13px;"><strong>Depot Access / Partnership</strong> — securing a real depot partner to mount cameras and run the 12-week pilot. Tech is proven in simulation; need physical depot access.</p>
+  </div>
+
+  <div class="source">Sources: [participant], [PDPA B.E. 2562]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s7" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s9" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 9: Screens & Flows — Dispatcher Flow -->
+<div class="slide s9">
+  <div class="slide-num">Slide 9 of 18 &middot; Screens & Flows</div>
+  <h2>Core Dispatcher Operational Flows</h2>
+
+  <div class="card">
+    <h3>Flow 1 — GPS & Edge-AI Crowding Ingestion</h3>
+    <div class="flow-step"><div class="flow-dot dot-blue">🔵</div><div class="flow-content"><strong>Entry:</strong><p>Every 15s: GPS + 90° camera +In/-Out + door dwell + rainfall</p></div></div>
+    <div class="flow-step"><div class="flow-dot dot-yellow">🟡</div><div class="flow-content"><strong>Staleness Gate:</strong><p>Telemetry ≤ 90 seconds?</p></div></div>
+    <div class="flow-step"><div class="flow-dot dot-red">🔴</div><div class="flow-content"><strong>Abstention:</strong><p>If stale → "Telemetry Stale (&gt;90s)" → fallback to baseline timetable</p></div></div>
+    <div class="flow-step"><div class="flow-dot dot-green">🟢</div><div class="flow-content"><strong>Fusion & Update:</strong><p>Snap to 728-vertex OSRM → Bayesian crowding → push to Dispatcher Console via SSE within 1s</p></div></div>
+  </div>
+
+  <div class="card">
+    <h3>Flow 2 — 8.6-Min Early Warning & Digital Twin</h3>
+    <div class="flow-step"><div class="flow-dot dot-blue">🔵</div><div class="flow-content"><strong>Predictor evaluates</strong><p>516.17s lookahead across all corridor vehicles</p></div></div>
+    <div class="flow-step"><div class="flow-dot dot-yellow">🟡</div><div class="flow-content"><strong>Risk Detection:</strong><p>Gap &gt;22 min? Bunching &lt;5 min? Crowding &gt;85%?</p></div></div>
+    <div class="flow-step"><div class="flow-dot dot-orange">🟠</div><div class="flow-content"><strong>Worker-Thread Twin:</strong><p>2.47ms simulation of -3 to +5 min shifts across 75%/100%/125% demand</p></div></div>
+    <div class="flow-step"><div class="flow-dot dot-green">🟢</div><div class="flow-content"><strong>Recommendation Card:</strong><p>Surfaces grounded Thai ≤120-word card to dispatcher</p></div></div>
+  </div>
+
+  <div class="card">
+    <h3>Flow 3 — Dispatcher 1-Click Approval</h3>
+    <div class="flow-step"><div class="flow-dot dot-blue">🔵</div><div class="flow-content"><strong>Review:</strong><p>นายท่า reads Corridor Ribbon + AI Recommendation Card</p></div></div>
+    <div class="flow-step"><div class="flow-dot dot-yellow">🟡</div><div class="flow-content"><strong>Decision:</strong><p>✅ อนุมัติ | คงเวลาเดิม | ⛔ KILL SWITCH</p></div></div>
+    <div class="flow-step"><div class="flow-dot dot-green">🟢</div><div class="flow-content"><strong>Execute:</strong><p>Re-verify bay readiness → update countdown → immutable audit log</p></div></div>
+  </div>
+
+  <div class="source">Sources: [participant]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s8" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s10" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 10: Screens — Wireframes -->
+<div class="slide s10">
+  <div class="slide-num">Slide 10 of 18 &middot; Screens & Flows (cont.)</div>
+  <h2>5 Core Operator Screens</h2>
+
+  <div class="grid-2">
+    <!-- Dispatcher Console Wireframe -->
+    <div>
+      <div class="screen-frame">
+        <div class="screen-header">🚍 Evenflow · dispatcher.html</div>
+        <div class="screen-body">
+          <div style="font-size:9px; color:var(--text-muted); margin-bottom:6px;">TELEMETRY &lt;15s &nbsp; | &nbsp; ⛔ KILL SWITCH: AI ON</div>
+          <div style="display:flex; gap:4px; margin-bottom:8px;">
+            <div style="flex:1; background:#f0f0f0; border-radius:4px; padding:4px; text-align:center;"><div style="font-size:8px; color:var(--text-muted);">Active</div><div style="font-size:14px; font-weight:700;">6</div></div>
+            <div style="flex:1; background:#f0f0f0; border-radius:4px; padding:4px; text-align:center;"><div style="font-size:8px; color:var(--text-muted);">Ready</div><div style="font-size:14px; font-weight:700;">2</div></div>
+            <div style="flex:1; background:#f0f0f0; border-radius:4px; padding:4px; text-align:center;"><div style="font-size:8px; color:var(--text-muted);">Headway</div><div style="font-size:14px; font-weight:700; color:var(--amber);">18m</div></div>
+          </div>
+          <!-- Mini corridor ribbon -->
+          <div class="ribbon" style="padding:8px; margin-bottom:8px;">
+            <div class="ribbon-line" style="left:8px; right:8px;"></div>
+            <div class="ribbon-stop"><div class="ribbon-stop-name">จตุจักร</div><div class="ribbon-stop-dot"></div></div>
+            <div class="ribbon-stop"><div class="ribbon-stop-name">อนุสาวรีย์</div><div class="ribbon-bus" style="background:#dc2626; color:white;">B01 88%</div></div>
+            <div class="ribbon-stop"><div class="ribbon-stop-name">ประตูน้ำ</div><div class="ribbon-bus" style="background:#d97706; color:white;">B02 74%</div></div>
+            <div class="ribbon-stop"><div class="ribbon-stop-name">สยาม</div><div class="ribbon-stop-dot"></div></div>
+            <div class="ribbon-stop"><div class="ribbon-stop-name">หัวลำโพง</div><div class="ribbon-bus" style="background:#15803d; color:white;">B03 32%</div></div>
+          </div>
+          <div style="background:var(--accent-light); border-radius:4px; padding:6px; font-size:9px; margin-bottom:6px;">
+            <strong>AI แนะนำ:</strong> ปล่อย B04 เร็วขึ้น 3 นาที<br>
+            ลดเวลารอ -42 วินาที · ลดแน่น -12%
+          </div>
+          <div style="display:flex; gap:4px;">
+            <div style="flex:1; background:var(--green); color:white; text-align:center; padding:4px; border-radius:4px; font-size:9px; font-weight:600;">✅ อนุมัติ</div>
+            <div style="flex:1; background:#f0f0f0; text-align:center; padding:4px; border-radius:4px; font-size:9px;">คงเวลาเดิม</div>
+          </div>
+        </div>
+      </div>
+      <p style="text-align:center; font-size:11px; color:var(--text-muted);">Dispatcher Console — Primary Screen</p>
+    </div>
+
+    <!-- KPI Dashboard Wireframe -->
+    <div>
+      <div class="screen-frame">
+        <div class="screen-header">📊 Evenflow · kpi.html</div>
+        <div class="screen-body">
+          <div style="font-size:9px; color:var(--text-muted); margin-bottom:6px;">A/B COMPARISON: Static vs. AI Evenflow</div>
+          <div class="screen-row"><span style="font-size:10px;">Wait-Time Saved</span><span class="screen-badge" style="background:#dcfce7; color:var(--green);">-660 person-sec</span></div>
+          <div class="screen-row"><span style="font-size:10px;">Headway Variance</span><span class="screen-badge" style="background:#dcfce7; color:var(--green);">-3.3%</span></div>
+          <div class="screen-row"><span style="font-size:10px;">Peak Crush Trips</span><span class="screen-badge" style="background:#dcfce7; color:var(--green);">38%→22%</span></div>
+          <div class="screen-row"><span style="font-size:10px;">Passenger Harm</span><span class="screen-badge" style="background:#dcfce7; color:var(--green);">0%</span></div>
+          <div style="margin-top:8px; font-size:9px; color:var(--text-muted);">840 Simulation Runs · 30/30 Seeds · 100% Win Rate</div>
+        </div>
+      </div>
+      <p style="text-align:center; font-size:11px; color:var(--text-muted);">KPI Dashboard — A/B Scorecard</p>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card" style="text-align:center;">
+      <div style="font-size:24px; margin-bottom:4px;">🤖</div>
+      <h3 style="font-size:12px;">aieval.html</h3>
+      <p style="font-size:11px; color:var(--text-secondary);">AI Precision tracker: 1.00 precision, 516.17s lead time, 2.47ms latency</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:24px; margin-bottom:4px;">🛡️</div>
+      <h3 style="font-size:12px;">governance.html</h3>
+      <p style="font-size:11px; color:var(--text-secondary);">Driver rest ≥6 min, EV SoC ≥35%, No-Blame ค่าเที่ยว, PDPA audit</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:24px; margin-bottom:4px;">👁️</div>
+      <h3 style="font-size:12px;">spotter.html</h3>
+      <p style="font-size:11px; color:var(--text-secondary);">Manual count vs. Edge-AI calibration (target: ≤±2 pax, ≥95%)</p>
+    </div>
+  </div>
+
+  <div class="source">Sources: [participant]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s9" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s11" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 11: Architecture -->
+<div class="slide s11">
+  <div class="slide-num">Slide 11 of 18 &middot; Architecture</div>
+  <h2>Five-Layer System Architecture</h2>
+
+  <div class="flow-step"><div class="flow-dot dot-blue" style="width:36px; height:36px; font-size:16px;">1</div><div class="flow-content"><strong>Edge-AI Door Camera & Fleet GPS Ingestion</strong><p>engine/telemetry.js — 15s GPS + 90° YOLOv8-Nano +In/-Out via True 5G IoT → AWS IoT Core. Local SQLite Store-and-Forward. 90-Second Honest Abstention fail-safe.</p></div></div>
+  <div class="flow-step"><div class="flow-dot dot-blue" style="width:36px; height:36px; font-size:16px;">2</div><div class="flow-content"><strong>Corridor Geometry & Turnaround State Engine</strong><p>engine/route_geo.js + engine/world.js — 728 WGS84 OSRM vertices, 8 signalized intersections, Open-Meteo rain, inbound turnaround ETAs in Amazon Timestream.</p></div></div>
+  <div class="flow-step"><div class="flow-dot dot-purple" style="width:36px; height:36px; font-size:16px; background:#ede9fe;">3</div><div class="flow-content"><strong>Bayesian Crowding Physics & 8.6-Min Predictor</strong><p>engine/bunching.js — 0.85×B_cam + 0.15×B_implied, 1.35× dwell multiplier at &gt;75% load. 516.17s lookahead, 1.00 precision, 78.21s MAE.</p></div></div>
+  <div class="flow-step"><div class="flow-dot dot-green" style="width:36px; height:36px; font-size:16px;">4</div><div class="flow-content"><strong>Counterfactual Digital Twin Optimizer</strong><p>engine/operations.js + engine/twin-worker.js on AWS ECS Fargate — Daganzo two-sided headway theory. 3 modes: Early Release, Depot Hold/Pre-Gap Pacing, Reserve Bus Alert. 2.47ms Worker Threads across 75%/100%/125% demand.</p></div></div>
+  <div class="flow-step"><div class="flow-dot dot-orange" style="width:36px; height:36px; font-size:16px;">5</div><div class="flow-content"><strong>Grounded Thai Dispatcher Copilot</strong><p>engine/copilot.js + Amazon Bedrock with Guardrails — ≤120-word Thai explanation, zero hallucinated figures.</p></div></div>
+
+  <div class="card" style="margin-top:16px;">
+    <h3>Edge Hardware Spec</h3>
+    <div style="font-size:13px; color:var(--text-secondary);">
+      9–36V DC buck-boost with 10s supercapacitor hold-up &middot; M12 vibration-locked ceiling brackets &middot; Fanless &lt;10W passive aluminum heatsink (45°C+) &middot; SQLite Store-and-Forward &middot; ~฿22,000/bus pilot BOM / ฿45,000 commercial turnkey
+    </div>
+  </div>
+
+  <div class="source">Sources: [participant], [Daganzo 2009]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s10" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s12" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 12: Scope -->
+<div class="slide s12">
+  <div class="slide-num">Slide 12 of 18 &middot; Scope</div>
+  <h2>MoSCoW Prioritized Scope</h2>
+
+  <div class="card">
+    <h3><span class="pill pill-red">P0 Must-Have</span> Ring 1 MVP + Ring 2 Pilot (1 Depot, 6–8 Buses)</h3>
+    <table>
+      <tbody>
+        <tr><td style="width:60px; font-family:monospace; font-weight:600;">P0.1</td><td>GPS & 90° Edge-AI Crowding Ingestion Engine</td></tr>
+        <tr><td style="font-family:monospace; font-weight:600;">P0.2</td><td>8.6-Min Headway-Gap & Crowding Early-Warning Predictor</td></tr>
+        <tr><td style="font-family:monospace; font-weight:600;">P0.3</td><td>Counterfactual Worker-Thread Digital Twin Depot Optimizer</td></tr>
+        <tr><td style="font-family:monospace; font-weight:600;">P0.4</td><td>Hard Depot Readiness, Driver Rest & No-Blame Guardrails</td></tr>
+        <tr><td style="font-family:monospace; font-weight:600;">P0.5</td><td>Human-in-the-Loop Dispatcher Console & A/B KPI Dashboard</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3><span class="pill pill-amber">P1 Should-Have</span> Ring 2 Pilot Enhancements</h3>
+    <table>
+      <tbody>
+        <tr><td style="width:60px; font-family:monospace; font-weight:600;">P1.1</td><td>Ruggedized 9–36V Edge-AI Camera Kits (6–8 buses) + AWS IoT</td></tr>
+        <tr><td style="font-family:monospace; font-weight:600;">P1.2</td><td>Amazon Bedrock Thai Dispatcher Copilot with Guardrails</td></tr>
+        <tr><td style="font-family:monospace; font-weight:600;">P1.3</td><td>Automated Route-Specific Dwell & Crowding Calibration</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3><span class="pill pill-accent">P2 Could-Have</span> Ring 3 Post-Pilot (Months 4–36)</h3>
+    <table>
+      <tbody>
+        <tr><td style="width:60px; font-family:monospace; font-weight:600;">P2.1</td><td>Bi-Directional O-D Depot Schedule Synchronization</td></tr>
+        <tr><td style="font-family:monospace; font-weight:600;">P2.2</td><td>Automated Standby Reserve-Bus Injection & Shift-Handover</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top:16px;">Explicitly Out of Scope</h3>
+  <div class="ooscope-item"><span class="ooscope-x">✕</span> Consumer / Passenger Mobile App or QR Check-Ins</div>
+  <div class="ooscope-item"><span class="ooscope-x">✕</span> Public Bus-Stop Kiosks, Street Displays, or BMA Hardware</div>
+  <div class="ooscope-item"><span class="ooscope-x">✕</span> Ticket / Farebox Revenue System Integration</div>
+  <div class="ooscope-item"><span class="ooscope-x">✕</span> Traffic-Signal Preemption or Mid-Route Holding</div>
+  <div class="ooscope-item"><span class="ooscope-x">✕</span> Autonomous Dispatching or Facial Recognition</div>
+
+  <div class="source">Sources: [participant]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s11" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s13" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 13: Success Criteria -->
+<div class="slide s13">
+  <div class="slide-num">Slide 13 of 18 &middot; Success Criteria</div>
+  <h2>SC1–SC6: Measurable Success Criteria</h2>
+
+  <table>
+    <thead><tr><th>SC</th><th>Metric</th><th>Ring 1 Baseline</th><th>Ring 2 Pilot Target</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>SC1</strong></td>
+        <td>Passenger Wait-Time</td>
+        <td style="font-family:monospace;">-660 person-sec (30/30 seeds)</td>
+        <td>≥12% P90 wait &amp; EWT reduction</td>
+      </tr>
+      <tr>
+        <td><strong>SC2</strong></td>
+        <td>Headway Regularity</td>
+        <td style="font-family:monospace;">-3.3% variance (53,574→51,791)</td>
+        <td>≥15% reduction in gaps &gt;22m &amp; bunching &lt;5m</td>
+      </tr>
+      <tr>
+        <td><strong>SC3</strong></td>
+        <td>Edge-AI Accuracy &amp; Crowding</td>
+        <td style="font-family:monospace;">Bayesian cross-check + 1.35× physics</td>
+        <td>≥95% accuracy (≤±2 pax); ≥15% peak crush reduction</td>
+      </tr>
+      <tr>
+        <td><strong>SC4</strong></td>
+        <td>AI Precision &amp; Lead Time</td>
+        <td style="font-family:monospace;">1.00 Precision; 516.17s lead; 78.21s MAE</td>
+        <td>≥0.85 Precision; ≥6–8 min lead</td>
+      </tr>
+      <tr>
+        <td><strong>SC5</strong></td>
+        <td>Dispatcher Adoption</td>
+        <td style="font-family:monospace;">2.47ms latency + 1-Click UI</td>
+        <td>≥70% approval rate; &lt;5s median review</td>
+      </tr>
+      <tr>
+        <td><strong>SC6</strong></td>
+        <td>Zero Harm &amp; Compliance</td>
+        <td style="font-family:monospace;">0% harm (0/840); 100% rest lock</td>
+        <td>0 violations; 100% PDPA compliance</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="source">Sources: [participant]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s12" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s14" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+  <!-- SLIDE 14: Team Composition -->
+<div class="slide s14">
+  <div class="slide-num">Slide 14 of 18 &middot; Team Composition</div>
+  <h2>Team Composition</h2>
+
+  <div class="grid-2">
+    <div class="card" style="border-left: 3px solid var(--accent);">
+      <div style="font-size:28px; margin-bottom:8px;">👩‍💻</div>
+      <h3>Solo Founder, Product Owner & Lead Engineer</h3>
+      <p style="font-size:15px; font-weight:600; margin-bottom:8px;">Bowornnan</p>
+      <span class="pill pill-green">✅ Active</span>
+      <ul style="font-size:12px; color:var(--text-secondary); margin-top:12px; padding-left:16px;">
+        <li>End-to-end dispatch mathematics & Counterfactual Digital Twin engine</li>
+        <li>Full-stack Node.js/ES6 codebase (91/91 tests, 1.02s)</li>
+        <li>All 5 core screens (dispatcher, kpi, aieval, governance, spotter)</li>
+        <li>Edge hardware integration & UX research</li>
+        <li>AWS cloud architecture (IoT Core, Timestream, ECS Fargate)</li>
+        <li>Amazon Bedrock Thai Copilot with Guardrails</li>
+        <li>Pilot delivery & stakeholder management</li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-left: 3px solid var(--red);">
+      <div style="font-size:28px; margin-bottom:8px;">🤝</div>
+      <h3>Depot Partnership / BD Lead</h3>
+      <p style="font-size:15px; font-weight:600; margin-bottom:8px;">To Recruit</p>
+      <span class="pill pill-red">🔴 Open</span>
+      <ul style="font-size:12px; color:var(--text-secondary); margin-top:12px; padding-left:16px;">
+        <li>Securing depot access agreements (Thammasat Rangsit, True Digital Park, BMTA/private operators)</li>
+        <li>Negotiating pilot MOUs with fleet managers & depot supervisors</li>
+        <li>Building relationships with Thai transit operators</li>
+        <li>Commercial pipeline for post-pilot ฿1,200/bus/mo SaaS contracts</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <strong>Why this role?</strong> Directly addresses the <strong>#1 constraint</strong> from Stage 3 — <em>Depot Access / Partnership</em>. A BD Lead with connections to BMTA ขสมก., Thai Smile Bus, university facility management, or EV concessionaires can unblock the critical gate to the 12-week pilot while the founder focuses on engineering.
+  </div>
+
+  <div class="source">Sources: [participant], [assumption]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s13" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s15" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 15: Timeline -->
+<div class="slide s15">
+  <div class="slide-num">Slide 15 of 18 &middot; Timeline</div>
+  <h2>Three-Ring Deployment Roadmap</h2>
+
+  <div class="timeline-item">
+    <div class="timeline-dot done"></div>
+    <div>
+      <span class="pill pill-green">Ring 1 — Completed (Day 0)</span>
+      <h3 style="margin-top:8px;">Working Dispatcher MVP & 840-Run Verified Digital Twin</h3>
+      <p style="font-size:13px; color:var(--text-secondary);">Full-stack web console (9 screens) live at ai-forall-eight.vercel.app with 91/91 passing tests and 840 hash-verified simulation runs. Cost: ฿0/month.</p>
+      <div style="margin-top:8px;">
+        <span class="pill pill-accent">9 Screens</span>
+        <span class="pill pill-accent">91/91 Tests</span>
+        <span class="pill pill-accent">840 Runs</span>
+        <span class="pill pill-accent">฿0/mo</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="timeline-item">
+    <div class="timeline-dot"></div>
+    <div>
+      <span class="pill pill-amber">Ring 2 — 12-Week Beachhead Depot Pilot (Months 1–3)</span>
+      <h3 style="margin-top:8px;">Stage A: Shadow Calibration (Weeks 1–3)</h3>
+      <p style="font-size:13px; color:var(--text-secondary);">Deploy dispatcher tablet (~฿15,000) in depot control room. Mount ruggedized 9–36V 90° Edge-AI Camera Kits (~฿22,000/bus BOM) on 6–8 buses. Run Shadow Mode over True 5G IoT → AWS IoT Core. Calibrate against manual spotter counts (target: ≥95% accuracy, ≤±2 pax).</p>
+      <h3 style="margin-top:12px;">Stage B: Active 1-Click AI Dispatch & A/B Trial (Weeks 4–12)</h3>
+      <p style="font-size:13px; color:var(--text-secondary);">Dispatchers use Evenflow's 1-Click Recommendations during peak hours across alternating A/B test weeks to measure SC1–SC6.</p>
+      <div style="margin-top:8px;">
+        <span class="pill pill-accent">1 Depot</span>
+        <span class="pill pill-accent">6–8 Buses</span>
+        <span class="pill pill-accent">&lt;฿210,000</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="timeline-item">
+    <div class="timeline-dot"></div>
+    <div>
+      <span class="pill pill-purple">Ring 3 — Multi-Depot Commercial Rollout (Months 4–36)</span>
+      <div class="grid-2" style="margin-top:8px;">
+        <div class="card">
+          <h3>Year 1 (Months 4–12)</h3>
+          <p style="font-size:13px; color:var(--text-secondary);">5–10 depots (150–300 buses) across private EV operators + initial BMTA zone depot MOU on AWS ECS Fargate & Amazon Bedrock.</p>
+        </div>
+        <div class="card">
+          <h3>Years 2–3</h3>
+          <p style="font-size:13px; color:var(--text-secondary);">30+ depots (1,000–1,500+ buses nationwide) at ฿45,000/bus turnkey kit + ฿1,200/bus/month SaaS.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="source">Sources: [participant]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s14" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s16" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 16: Key Risks & Mitigations -->
+<div class="slide s16">
+  <div class="slide-num">Slide 16 of 18 &middot; Key Risks & Mitigations</div>
+  <h2>Key Risks & Mitigations</h2>
+
+  <div class="card" style="border-left: 3px solid var(--red);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <h3 style="margin:0;">R1 — All Inbound Buses Delayed by Severe Gridlock</h3>
+      <span class="pill pill-amber">Med / High</span>
+    </div>
+    <p style="font-size:13px; color:var(--text-secondary);">No physical bus in depot bay for early release.</p>
+    <div style="margin-top:8px; padding:8px 12px; background:#f8f8f8; border-radius:6px; font-size:12px;">
+      <strong>Mitigation:</strong> Inbound Turnaround Tracker + Proactive Pre-Gap Pacing: tracks returning buses 20–30 min ahead; spaces out remaining depot buses (+2 to +5 min); alerts dispatcher for reserve bus injection.
+    </div>
+  </div>
+
+  <div class="card" style="border-left: 3px solid var(--red);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <h3 style="margin:0;">R2 — Dispatcher / Driver Resistance</h3>
+      <span class="pill pill-amber">Med / High</span>
+    </div>
+    <p style="font-size:13px; color:var(--text-secondary);">Fear that AI adjustments will cut rest or reduce ค่าเที่ยว income.</p>
+    <div style="margin-top:8px; padding:8px 12px; background:#f8f8f8; border-radius:6px; font-size:12px;">
+      <strong>Mitigation:</strong> 100% Human-in-the-Loop + Hard Labor Locks: ≥6 min rest lock, No-Blame Charter (ไม่หักเงินอัตโนมัติ · ไม่เสียค่าเที่ยว), 1-second ribbon, Emergency Kill Switch.
+    </div>
+  </div>
+
+  <div class="card" style="border-left: 3px solid var(--amber);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <h3 style="margin:0;">R3 — Camera Occlusion or Vehicle Power Surge</h3>
+      <span class="pill pill-accent">Low-Med / Med</span>
+    </div>
+    <p style="font-size:13px; color:var(--text-secondary);">Heavy rain/umbrellas at doorway or 24V crank surges.</p>
+    <div style="margin-top:8px; padding:8px 12px; background:#f8f8f8; border-radius:6px; font-size:12px;">
+      <strong>Mitigation:</strong> Bayesian Vision-Dwell Cross-Check (0.85×Cam + 0.15×ImpliedDwell) + zero-reset at turnaround + 9–36V DC automotive surge regulator & &lt;10W 45°C heatsink.
+    </div>
+  </div>
+
+  <div class="card" style="border-left: 3px solid var(--amber);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <h3 style="margin:0;">R4 — State Enterprise Procurement Delays (ขสมก.)</h3>
+      <span class="pill pill-accent">Med / Med</span>
+    </div>
+    <p style="font-size:13px; color:var(--text-secondary);">Long public tender cycles for BMTA.</p>
+    <div style="margin-top:8px; padding:8px 12px; background:#f8f8f8; border-radius:6px; font-size:12px;">
+      <strong>Mitigation:</strong> Bottom-Up Campus/Private Depot Beachhead: launch at single-decision-maker University Campus Shuttle (มธ. รังสิต via TU-RAC) or Private EV Depot (2–3 week sign-off, &lt;฿210k) to generate audited ROI before BMTA expansion.
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card" style="border-left: 3px solid var(--purple);">
+      <h3>R5 — Doorway Crowd Occlusion & Counting Drift</h3>
+      <p style="font-size:12px; color:var(--text-secondary);">Peak rush-hour drops raw accuracy ~97% → ~88–90%.</p>
+      <p style="font-size:11px; margin-top:6px;"><strong>Fix:</strong> Bayesian cross-check + zero-reset at turnaround + Weeks 1–3 Shadow Calibration vs. manual spotters until ≥95%.</p>
+    </div>
+    <div class="card" style="border-left: 3px solid var(--purple);">
+      <h3>R6 — Harsh Bus Electrical & Thermal Environment</h3>
+      <p style="font-size:12px; color:var(--text-secondary);">45°C+ cabin, vibration, 24V crank surges.</p>
+      <p style="font-size:11px; margin-top:6px;"><strong>Fix:</strong> ~฿22k kit: 9–36V buck-boost + 10s supercapacitor + M12 vibration brackets + fanless &lt;10W heatsink + SQLite Store-and-Forward.</p>
+    </div>
+  </div>
+
+  <div class="source">Sources: [participant], [Manager Online transit labor reports], [APC Sensor Studies]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s15" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s17" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 17: Open Assumptions & Decision Log -->
+<div class="slide s17">
+  <div class="slide-num">Slide 17 of 18 &middot; Assumptions & Decision Log</div>
+  <h2>Open Assumptions</h2>
+  <p class="subtitle">All 3 assumptions reviewed and confirmed — 0 items remain unconfirmed</p>
+
+  <table>
+    <thead><tr><th>#</th><th>Assumption</th><th>Status</th><th>Validation Plan</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>A1</strong></td>
+        <td>Pilot depot will grant GPS access and permit mounting 6–8 non-invasive 90° door cameras</td>
+        <td><span class="pill pill-green">Confirmed</span></td>
+        <td>Week 1 depot onboarding; built-in GPS replay + spotter.html simulator as fallback</td>
+      </tr>
+      <tr>
+        <td><strong>A2</strong></td>
+        <td>Dispatchers will approve ≥70% of AI departure adjustments when recommendations take &lt;5s to read and protect driver rest</td>
+        <td><span class="pill pill-green">Confirmed</span></td>
+        <td>Measure approval vs. dismissal rates in Immutable Audit Log, Weeks 4–12 (SC5)</td>
+      </tr>
+      <tr>
+        <td><strong>A3</strong></td>
+        <td>No existing Thai bus depot combines 90° PDPA-safe Edge-AI crowding with a Counterfactual Digital Twin for depot scheduling</td>
+        <td><span class="pill pill-green">Confirmed</span></td>
+        <td>Confirmed across Stage 2 competitive audit; continue monitoring during pilot</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 style="margin-top:24px;">Key Decisions (D1–D13)</h2>
+
+  <table>
+    <thead><tr><th>#</th><th>Decision</th><th>Stage</th></tr></thead>
+    <tbody>
+      <tr><td><strong>D1</strong></td><td>Selected 🚍 Smart Mobility & Cities pillar</td><td>Step 0</td></tr>
+      <tr><td><strong>D2</strong></td><td>Classified as New Product — run all stages</td><td>Stage 1</td></tr>
+      <tr><td><strong>D3</strong></td><td>Primary persona: Depot Dispatcher ("นายท่า")</td><td>Stage 1</td></tr>
+      <tr><td><strong>D4</strong></td><td>Critical assumption: Dispatcher adoption & trust</td><td>Stage 1</td></tr>
+      <tr><td><strong>D5</strong></td><td>100% depot dispatcher — ZERO consumer/passenger app</td><td>Stage 1 & 4</td></tr>
+      <tr><td><strong>D6</strong></td><td>Crowding via 90° Edge-AI Camera — ZERO ticket/farebox</td><td>Stage 1 & 3</td></tr>
+      <tr><td><strong>D7</strong></td><td>Depot Departure over mid-route holding (840-run proof)</td><td>Stage 3 & 4</td></tr>
+      <tr><td><strong>D8</strong></td><td>Hard ≥6 min Driver Rest & No-Blame ค่าเที่ยว Guardrails</td><td>Stage 3 & 4</td></tr>
+      <tr><td><strong>D9</strong></td><td>Campus/Private EV Depot beachhead (6–8 buses, &lt;฿210k)</td><td>Stage 4 & 7</td></tr>
+      <tr><td><strong>D10</strong></td><td>Biggest constraint: Depot Access / Partnership</td><td>Stage 3</td></tr>
+      <tr><td><strong>D11</strong></td><td>Skill gap: Depot Partnership / BD Lead (to recruit)</td><td>Stage 5</td></tr>
+      <tr><td><strong>D12</strong></td><td>All 5 core screens highlighted for mockup walkthrough</td><td>Stage 6</td></tr>
+      <tr><td><strong>D13</strong></td><td>All 3 assumptions confirmed, risk accepted for pilot</td><td>Stage 7</td></tr>
+    </tbody>
+  </table>
+
+  <div class="source">Sources: [participant], [user selection], [assumption]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s16" class="nav-btn nav-btn-secondary">← Back</label>
+    <label for="s18" class="nav-btn nav-btn-primary">Next →</label>
+  </div>
+</div>
+
+<!-- SLIDE 18: Go / No-Go & Sources -->
+<div class="slide s18">
+  <div class="slide-num">Slide 18 of 18 &middot; Go / No-Go & Evidence</div>
+
+  <div class="verdict-box">
+    <div style="font-size:48px; margin-bottom:8px;">✅</div>
+    <h2 style="font-size:32px;">GO — High Confidence</h2>
+    <p style="font-size:16px; color:var(--green);">Proceed to Phase 2 Inception & 12-Week Ring 2 Beachhead Depot Field Pilot</p>
+  </div>
+
+  <h2>Core Rationale</h2>
+
+  <div class="grid-3">
+    <div class="card" style="text-align:center; border-top:3px solid var(--green);">
+      <div style="font-size:28px; margin-bottom:8px;">🎯</div>
+      <h3 style="font-size:13px;">Zero Unrealistic Dependencies</h3>
+      <p style="font-size:12px; color:var(--text-secondary);">100% inside the depot. Zero passenger app, zero street permits, zero farebox integration.</p>
+    </div>
+    <div class="card" style="text-align:center; border-top:3px solid var(--accent);">
+      <div style="font-size:28px; margin-bottom:8px;">🔬</div>
+      <h3 style="font-size:13px;">Scientifically Proven Today</h3>
+      <p style="font-size:12px; color:var(--text-secondary);">91/91 tests, 2.47ms latency, 840-run verified: -660 person-sec, -3.3% variance, 0% harm.</p>
+    </div>
+    <div class="card" style="text-align:center; border-top:3px solid var(--purple);">
+      <div style="font-size:28px; margin-bottom:8px;">💰</div>
+      <h3 style="font-size:13px;">Financially Viable</h3>
+      <p style="font-size:12px; color:var(--text-secondary);">&lt;฿210k pilot. ฿1,200/bus/mo SaaS (~80% cheaper than foreign). Driver rest & ค่าเที่ยว protected.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Conditions for Phase 2 Execution</h3>
+    <div class="flow-step"><div class="flow-dot dot-blue">1</div><div class="flow-content"><strong>Finalize 12-week pilot agreement</strong><p>อู่รถรับส่ง มธ. รังสิต via TU-RAC or private EV feeder depot</p></div></div>
+    <div class="flow-step"><div class="flow-dot dot-amber">2</div><div class="flow-content"><strong>Run Stage A Shadow Mode (Weeks 1–3)</strong><p>Verify ≥95% Edge-AI camera accuracy before enabling active 1-Click dispatch</p></div></div>
+    <div class="flow-step"><div class="flow-dot dot-green">3</div><div class="flow-content"><strong>Maintain all guardrails throughout pilot</strong><p>≥6-min driver rest lock, No-Blame ค่าเที่ยว protection, active Emergency Kill Switch</p></div></div>
+  </div>
+
+  <h2 style="margin-top:24px;">Evidence & Sources</h2>
+
+  <table>
+    <thead><tr><th>#</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><strong>Participant & Evenflow Verified Engineering Benchmark</strong> — Live prototype, GitHub repo, 91/91 tests, 840 SHA-256 hash-matched simulation runs</td></tr>
+      <tr><td>2</td><td><strong>TDRI & OTP</strong> — Urban public bus reliability studies (15–30+ min gaps, &lt;20% satisfaction)</td></tr>
+      <tr><td>3</td><td><strong>Daganzo, C. F. (2009)</strong> — Headway-based approach to eliminate bus bunching, Transportation Research Part B</td></tr>
+      <tr><td>4</td><td><strong>Drabicki, Kucharski & Cats (2023)</strong> — Mitigating bus bunching and passenger crowding dynamics (1.35× dwell inflation)</td></tr>
+      <tr><td>5</td><td><strong>Singapore LTA</strong> — Bus Service Reliability Framework (BSRF) & Excess Wait Time (EWT) evaluations</td></tr>
+      <tr><td>6</td><td><strong>Thai Transit Labor Reports</strong> — Manager Online & Thai Post on EV bus driver turnaround pressures & ค่าเที่ยว</td></tr>
+      <tr><td>7</td><td><strong>Enterprise Transit SaaS Benchmarks</strong> — Swiftly & Optibus pricing ($150–300+/bus/mo + ฿120k–200k+ 3D sensors)</td></tr>
+      <tr><td>8</td><td><strong>APC Sensor Literature</strong> — MDPI Sensors / IEEE ITS: 90° overhead vision vs. Wi-Fi MAC (70–80% drift) & IR beams</td></tr>
+      <tr><td>9</td><td><strong>Thailand PDPA B.E. 2562</strong> — Anonymous silhouette counting in RAM = no PII collection</td></tr>
+      <tr><td>10</td><td><strong>Validated Assumptions (A1–A3)</strong> — All confirmed with Ring 2 pilot validation plans</td></tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:32px; text-align:center; padding:24px; background:var(--card); border-radius:12px; border:1px solid var(--border);">
+    <div style="font-size:36px; margin-bottom:8px;">🚍</div>
+    <h2 style="margin-bottom:4px;">Evenflow</h2>
+    <p style="font-size:14px; color:var(--text-secondary);">Real-Time AI Depot Dispatch & Headway Planning System</p>
+    <p style="font-size:13px; color:var(--text-muted); margin-top:8px;">AI for All Thailand Innovation Sprint 2026</p>
+    <p style="font-size:13px; color:var(--text-muted);">Bowornnan — Solo Founder</p>
+    <p style="font-size:12px; color:var(--accent); margin-top:8px;">ai-forall-eight.vercel.app &middot; github.com/Alicebbb111/AI-for-all</p>
+  </div>
+
+  <div class="source">Sources: [participant], [TDRI & OTP], [Daganzo 2009], [Drabicki et al. 2023], [Singapore LTA BSRF], [Manager Online], [Swiftly & Optibus benchmarks], [APC Sensor Studies], [PDPA B.E. 2562], [assumption]</div>
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <label for="s17" class="nav-btn nav-btn-secondary">← Back</label>
+  </div>
+</div>
+
+
+</section>
+
+<script>
+(function(){
+ var explore=document.getElementById("explore-full-project");
+ if(explore){explore.addEventListener("click",function(e){e.preventDefault();document.body.classList.add("presentation-open");document.getElementById("full-project").scrollTop=0;history.pushState({view:"presentation"},"", "#full-project");});}
+
+ document.addEventListener("keydown",function(event){
+   if(!document.body.classList.contains("presentation-open")) return;
+   if(event.altKey||event.ctrlKey||event.metaKey||event.shiftKey) return;
+   var target=event.target;
+   if(target&&(/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(target.tagName)||target.isContentEditable)) return;
+   if(event.key!=="ArrowLeft"&&event.key!=="ArrowRight") return;
+   var current=document.querySelector("#full-project input[name=slide]:checked");
+   if(!current) return;
+   var slideNumber=parseInt(current.id.slice(1),10);
+   var nextNumber=event.key==="ArrowRight"?Math.min(18,slideNumber+1):Math.max(1,slideNumber-1);
+   if(nextNumber===slideNumber) return;
+   event.preventDefault();
+   var nextRadio=document.getElementById("s"+nextNumber);
+   if(nextRadio) nextRadio.checked=true;
+ });
+ window.addEventListener("popstate",function(event){document.body.classList.remove("presentation-open");});
+})();
+</script>
+</body>
+</html>
+
