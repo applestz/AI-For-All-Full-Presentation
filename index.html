@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Evenflow — moodengs</title>
+  <title>Evenflow — Moodengs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
@@ -113,13 +113,13 @@
     .hero-bus { position: absolute; bottom: 48px; right: 5%; z-index: 5; width: 280px; height: 140px; }
     .skyline { position: absolute; bottom: 0; left: 0; width: 100%; height: 200px; pointer-events: none; z-index: 2; }
 
-    /* SCENE 2: EXPLANATION — longer scroll for hold */
+    /* SCENE 2: EXPLANATION — complete the reveal, then hold for reading before Scene 3 */
     .scene-explanation {
-      height: 500vh;
+      height: 300vh;
       position: relative;
       background: linear-gradient(180deg, #e8f5e9 0%, #e3f2fd 20%, var(--white) 100%);
     }
-    .explanation-pin { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; align-items: center; }
+    .explanation-pin { position: relative; height: 100vh; overflow: hidden; display: flex; align-items: center; }
     .explanation-bus { position: absolute; left: 80%; bottom: 76px; width: 320px; z-index: 10; }
     .road { position: absolute; bottom: 0; width: 100%; height: 80px; background: var(--road-color); z-index: 1; }
     .road::before {
@@ -141,7 +141,7 @@
     /* SCENE 3: IMPACT */
     .scene-impact { height: 400vh; position: relative; background: var(--white); }
     .impact-pin {
-      position: sticky; top: 0; height: 100vh; width: 100%;
+      position: relative; height: 100vh; width: 100%;
       overflow: hidden; display: flex; align-items: center; justify-content: center;
     }
     .impact-bus { position: absolute; left: 12%; bottom: 25%; z-index: 10; width: 320px; }
@@ -454,7 +454,76 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 #full-project input#s17:checked ~ .slide.s17,
 #full-project input#s18:checked ~ .slide.s18 { display: block; }
 
-#full-project .keyboard-hint { font-size:12px; color:var(--text-muted); margin:0 0 14px; }
+#full-project .keyboard-hint { font-size:12px; color:var(--text-muted); text-align:left; margin:16px 0 10px; }
+#full-project .team-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin:16px 0;
+}
+#full-project .team-member-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-top:3px solid var(--accent);
+  border-radius:10px;
+  padding:14px 16px;
+}
+#full-project .team-member-heading {
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+}
+#full-project .team-member-number {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 30px;
+  height:30px;
+  border-radius:8px;
+  background:var(--accent-light);
+  color:var(--accent);
+  font-size:11px;
+  font-weight:700;
+}
+#full-project .team-member-identity { min-width:0; flex:1; }
+#full-project .team-member-name { margin:0 0 2px; font-size:16px; color:var(--text); }
+#full-project .team-member-role { margin:0; font-size:12px; line-height:1.4; color:var(--text-secondary); }
+#full-project .team-member-status {
+  flex:0 0 auto;
+  padding:3px 8px;
+  border-radius:999px;
+  background:#dcfce7;
+  color:var(--green);
+  font-size:10px;
+  font-weight:700;
+}
+#full-project .team-member-focus {
+  margin:12px 0 0;
+  padding-top:10px;
+  border-top:1px solid #f0f0f0;
+  color:var(--text-secondary);
+  font-size:12px;
+  line-height:1.55;
+}
+#full-project .team-member-focus strong { color:var(--text); margin-right:5px; }
+#full-project .team-note {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  margin:8px 0 14px;
+  padding:14px 16px;
+  border-left:3px solid var(--green);
+  border-radius:0 8px 8px 0;
+  background:#f0fdf4;
+  color:var(--text-secondary);
+  font-size:12px;
+  line-height:1.5;
+}
+#full-project .team-note strong { color:var(--green); font-size:13px; }
+@media (max-width: 700px) {
+  #full-project .team-grid { grid-template-columns:1fr; }
+  #full-project .team-member-card { padding:12px; }
+}
 #full-project .nav-btn {
     display: inline-block;
     padding: 8px 20px;
@@ -600,7 +669,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
       <div class="cloud cloud-3"></div>
     </div>
     <div class="hero-content">
-      <p class="team-name" id="teamName">moodengs</p>
+      <p class="team-name" id="teamName">Moodengs</p>
       <h1 class="brand-title" id="brandTitle"></h1>
       <p class="tagline" id="tagline">Better bus spacing starts at the depot.</p>
       <p class="tagline-thai" id="taglineThai">AI-assisted departure planning for depot dispatchers — นายท่า</p>
@@ -893,11 +962,11 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
         scrollTrigger: { trigger: '#scene-hero', start: '60% top', end: 'bottom top', scrub: 1 }
       });
 
-      /* SCENE 2 — animation uses 50% of scroll, remaining 50% = hold */
+      /* SCENE 2 — reveal all copy, hold it on screen, then release into Scene 3 */
       var explanationTimeline = gsap.timeline({
         scrollTrigger: {
-          trigger: '#scene-explanation', start: 'top top', end: '50% bottom',
-          scrub: 1, pin: '.explanation-pin',
+          trigger: '#scene-explanation', start: 'top top', end: 'bottom top',
+          scrub: true, pin: '.explanation-pin', pinSpacing: false,
           onUpdate: function (self) { if (self.progress > 0.1) updateActiveNavDot(1); }
         }
       });
@@ -906,7 +975,8 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
         .fromTo('#buildingsBg', { x: 0 }, { x: -300, duration: 3, ease: 'none' }, 0)
         .fromTo('#explanationText', { opacity: 0, x: 80 }, { opacity: 1, x: 0, duration: 1.5, ease: 'power2.out' }, 1)
         .fromTo('#explanationText h2', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.5, ease: 'power3.out' }, 1.2)
-        .fromTo('#explanationText p', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1, stagger: 0.3, ease: 'power2.out' }, 1.8);
+        .fromTo('#explanationText p', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1, stagger: 0.3, ease: 'power2.out' }, 1.8)
+        .to({ hold: 0 }, { hold: 1, duration: 1.6, ease: 'none' });
 
       /* SCENE 3 */
       var runsStrips    = buildRollingDigits('statRuns',      '840');
@@ -915,8 +985,8 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 
       var impactTimeline = gsap.timeline({
         scrollTrigger: {
-          trigger: '#scene-impact', start: 'top top', end: '85% bottom',
-          scrub: 1, pin: '.impact-pin',
+          trigger: '#scene-impact', start: 'top top', end: 'bottom top',
+          scrub: true, pin: '.impact-pin', pinSpacing: false,
           onUpdate: function (self) { if (self.progress > 0.1) updateActiveNavDot(2); }
         }
       });
@@ -940,7 +1010,9 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
       addRollingToTimeline(impactTimeline, runsStrips,    4.3);
       addRollingToTimeline(impactTimeline, disruptStrips, 4.4);
       addRollingToTimeline(impactTimeline, warningStrips, 4.5);
-      impactTimeline.to('#statsRow', { opacity: 1, duration: 2.5 }, 6.0);
+      impactTimeline
+        .to('#statsRow', { opacity: 1, duration: 2.5 }, 6.0)
+        .to({ hold: 0 }, { hold: 1, duration: 3.5, ease: 'none' });
 
       /* SCENE 4 */
       gsap.fromTo('#ctaContent',
@@ -981,7 +1053,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 1: Title / Overview -->
 <div class="slide s1">
   <div class="slide-num">Slide 1 of 18 &middot; Overview</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h1>🚍 Evenflow</h1>
   <p class="subtitle">Real-Time AI Depot Dispatch & Headway Planning System</p>
   <p style="font-size:14px; color:var(--text-secondary); margin-bottom:24px;">ระบบวางแผนและปรับตารางปล่อยรถเมล์จากอู่แบบเรียลไทม์สำหรับนายท่า</p>
@@ -1005,9 +1076,10 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 
   <div class="grid-3">
     <div class="card" style="text-align:center;">
-      <div class="card-label">Owner</div>
-      <div style="font-size:16px; font-weight:600;">Bowornnan</div>
-      <div style="font-size:12px; color:var(--text-muted);">Solo Founder</div>
+      <div class="card-label">Team</div>
+      <div style="font-size:16px; font-weight:600;">Moodengs</div>
+      <div style="font-size:11px; color:var(--text-muted); line-height:1.45; margin-top:4px;">Bowornnan, Thananwat,<br>Nuchvara, Nattapong, Paweenarin</div>
+      <div style="font-size:11px; color:var(--green); margin-top:5px;">5 team members</div>
     </div>
     <div class="card" style="text-align:center;">
       <div class="card-label">Status</div>
@@ -1015,14 +1087,16 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
     </div>
     <div class="card" style="text-align:center;">
       <div class="card-label">Prototype</div>
-      <div style="font-size:12px; font-weight:600;">ai-forall-eight.vercel.app</div>
+      <a href="https://ai-forall-eight.vercel.app/" target="_blank" rel="noopener noreferrer" style="font-size:12px; font-weight:600; color:var(--accent); text-decoration:underline;">ai-forall-eight.vercel.app</a>
       <div style="font-size:11px; color:var(--text-muted);">9 screens · 91/91 tests</div>
     </div>
   </div>
 
   <div class="source">Sources: [participant], [user selection]</div>
 
-  <div style="margin-top:24px; text-align:center;">
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
+  <div style="margin-top:16px; display:flex; justify-content:space-between; gap:8px;">
+    <a href="#landing" id="overview-back-to-landing" class="nav-btn nav-btn-secondary">← Back</a>
     <label for="s2" class="nav-btn nav-btn-primary">Start Presentation →</label>
   </div>
 </div>
@@ -1030,7 +1104,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 2: Problem Statement -->
 <div class="slide s2">
   <div class="slide-num">Slide 2 of 18 &middot; Problem Statement</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>The Problem: Bus Bunching & Service Gaps</h2>
 
   <div class="grid-2">
@@ -1081,6 +1154,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </div>
 
   <div class="source">Sources: [TDRI & OTP public transit studies], [participant], [Drabicki et al. 2023], [Singapore LTA BSRF evaluations]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s1" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s3" class="nav-btn nav-btn-primary">Next →</label>
@@ -1090,7 +1164,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 3: Why the Depot Dispatcher -->
 <div class="slide s3">
   <div class="slide-num">Slide 3 of 18 &middot; Problem Statement (cont.)</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>Why the Depot Dispatcher ("นายท่า") Is the Single Intervention Point</h2>
 
   <div class="card">
@@ -1109,6 +1182,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </div>
 
   <div class="source">Sources: [participant], [TDRI & OTP public transit studies]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s2" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s4" class="nav-btn nav-btn-primary">Next →</label>
@@ -1118,7 +1192,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 4: Solution Summary -->
 <div class="slide s4">
   <div class="slide-num">Slide 4 of 18 &middot; Solution Summary</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>Evenflow: Three-Layer Innovation</h2>
   <p class="subtitle">100% B2B/B2G Depot Dispatch Decision-Support — Zero Consumer App, Zero Street Hardware</p>
 
@@ -1147,6 +1220,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </div>
 
   <div class="source">Sources: [participant], [Drabicki et al. 2023], [Daganzo 2009]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s3" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s5" class="nav-btn nav-btn-primary">Next →</label>
@@ -1156,7 +1230,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 5: Verified Results -->
 <div class="slide s5">
   <div class="slide-num">Slide 5 of 18 &middot; Solution Summary (cont.)</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>Verified Results: 840 Simulation Runs</h2>
 
   <div class="grid-4">
@@ -1200,6 +1273,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </div>
 
   <div class="source">Sources: [participant]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s4" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s6" class="nav-btn nav-btn-primary">Next →</label>
@@ -1209,7 +1283,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 6: Confirmed Parameters -->
 <div class="slide s6">
   <div class="slide-num">Slide 6 of 18 &middot; Confirmed Parameters</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>Confirmed Parameters</h2>
 
   <table>
@@ -1228,6 +1301,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </table>
 
   <div class="source">Sources: [participant], [user selection], [assumption]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s5" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s7" class="nav-btn nav-btn-primary">Next →</label>
@@ -1237,7 +1311,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 7: Competitive Landscape -->
 <div class="slide s7">
   <div class="slide-num">Slide 7 of 18 &middot; Competitive Landscape</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>5 Competitor Categories vs. Evenflow</h2>
 
   <table>
@@ -1286,6 +1359,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </div>
 
   <div class="source">Sources: [TDRI & OTP], [web research], [Singapore LTA BSRF], [Swiftly & Optibus benchmarks], [APC Sensor Studies], [participant]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s6" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s8" class="nav-btn nav-btn-primary">Next →</label>
@@ -1295,7 +1369,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 8: Feasibility Assessment -->
 <div class="slide s8">
   <div class="slide-num">Slide 8 of 18 &middot; Feasibility Assessment</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>Feasibility: All 5 Dimensions — HIGH (GO)</h2>
 
   <div class="card">
@@ -1342,6 +1415,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </div>
 
   <div class="source">Sources: [participant], [PDPA B.E. 2562]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s7" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s9" class="nav-btn nav-btn-primary">Next →</label>
@@ -1351,7 +1425,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 9: Screens & Flows — Dispatcher Flow -->
 <div class="slide s9">
   <div class="slide-num">Slide 9 of 18 &middot; Screens & Flows</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>Core Dispatcher Operational Flows</h2>
 
   <div class="card">
@@ -1378,6 +1451,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </div>
 
   <div class="source">Sources: [participant]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s8" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s10" class="nav-btn nav-btn-primary">Next →</label>
@@ -1387,7 +1461,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 10: Screens — Wireframes -->
 <div class="slide s10">
   <div class="slide-num">Slide 10 of 18 &middot; Screens & Flows (cont.)</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>5 Core Operator Screens</h2>
 
   <div class="grid-2">
@@ -1460,6 +1533,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </div>
 
   <div class="source">Sources: [participant]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s9" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s11" class="nav-btn nav-btn-primary">Next →</label>
@@ -1469,7 +1543,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 11: Architecture -->
 <div class="slide s11">
   <div class="slide-num">Slide 11 of 18 &middot; Architecture</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>Five-Layer System Architecture</h2>
 
   <div class="flow-step"><div class="flow-dot dot-blue" style="width:36px; height:36px; font-size:16px;">1</div><div class="flow-content"><strong>Edge-AI Door Camera & Fleet GPS Ingestion</strong><p>engine/telemetry.js — 15s GPS + 90° YOLOv8-Nano +In/-Out via True 5G IoT → AWS IoT Core. Local SQLite Store-and-Forward. 90-Second Honest Abstention fail-safe.</p></div></div>
@@ -1486,6 +1559,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </div>
 
   <div class="source">Sources: [participant], [Daganzo 2009]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s10" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s12" class="nav-btn nav-btn-primary">Next →</label>
@@ -1495,7 +1569,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 12: Scope -->
 <div class="slide s12">
   <div class="slide-num">Slide 12 of 18 &middot; Scope</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>MoSCoW Prioritized Scope</h2>
 
   <div class="card">
@@ -1540,6 +1613,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   <div class="ooscope-item"><span class="ooscope-x">✕</span> Autonomous Dispatching or Facial Recognition</div>
 
   <div class="source">Sources: [participant]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s11" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s13" class="nav-btn nav-btn-primary">Next →</label>
@@ -1549,7 +1623,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 13: Success Criteria -->
 <div class="slide s13">
   <div class="slide-num">Slide 13 of 18 &middot; Success Criteria</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>SC1–SC6: Measurable Success Criteria</h2>
 
   <table>
@@ -1595,6 +1668,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </table>
 
   <div class="source">Sources: [participant]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s12" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s14" class="nav-btn nav-btn-primary">Next →</label>
@@ -1604,45 +1678,78 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   <!-- SLIDE 14: Team Composition -->
 <div class="slide s14">
   <div class="slide-num">Slide 14 of 18 &middot; Team Composition</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>Team Composition</h2>
+  <p class="subtitle">Five active members covering the full Evenflow product and technology stack.</p>
 
-  <div class="grid-2">
-    <div class="card" style="border-left: 3px solid var(--accent);">
-      <div style="font-size:28px; margin-bottom:8px;">👩‍💻</div>
-      <h3>Solo Founder, Product Owner & Lead Engineer</h3>
-      <p style="font-size:15px; font-weight:600; margin-bottom:8px;">Bowornnan</p>
-      <span class="pill pill-green">✅ Active</span>
-      <ul style="font-size:12px; color:var(--text-secondary); margin-top:12px; padding-left:16px;">
-        <li>End-to-end dispatch mathematics & Counterfactual Digital Twin engine</li>
-        <li>Full-stack Node.js/ES6 codebase (91/91 tests, 1.02s)</li>
-        <li>All 5 core screens (dispatcher, kpi, aieval, governance, spotter)</li>
-        <li>Edge hardware integration & UX research</li>
-        <li>AWS cloud architecture (IoT Core, Timestream, ECS Fargate)</li>
-        <li>Amazon Bedrock Thai Copilot with Guardrails</li>
-        <li>Pilot delivery & stakeholder management</li>
-      </ul>
-    </div>
+  <div class="team-grid">
+    <article class="team-member-card">
+      <div class="team-member-heading">
+        <span class="team-member-number">01</span>
+        <div class="team-member-identity">
+          <h3 class="team-member-name">Bowornnan</h3>
+          <p class="team-member-role">Project Lead &amp; AI/ML Engineer</p>
+        </div>
+        <span class="team-member-status">Active</span>
+      </div>
+      <p class="team-member-focus"><strong>Focus</strong> Project direction, headway prediction, Counterfactual Digital Twin optimization, dispatch mathematics, AWS cloud architecture, and Amazon Bedrock Copilot.</p>
+    </article>
 
-    <div class="card" style="border-left: 3px solid var(--red);">
-      <div style="font-size:28px; margin-bottom:8px;">🤝</div>
-      <h3>Depot Partnership / BD Lead</h3>
-      <p style="font-size:15px; font-weight:600; margin-bottom:8px;">To Recruit</p>
-      <span class="pill pill-red">🔴 Open</span>
-      <ul style="font-size:12px; color:var(--text-secondary); margin-top:12px; padding-left:16px;">
-        <li>Securing depot access agreements (Thammasat Rangsit, True Digital Park, BMTA/private operators)</li>
-        <li>Negotiating pilot MOUs with fleet managers & depot supervisors</li>
-        <li>Building relationships with Thai transit operators</li>
-        <li>Commercial pipeline for post-pilot ฿1,200/bus/mo SaaS contracts</li>
-      </ul>
-    </div>
+    <article class="team-member-card">
+      <div class="team-member-heading">
+        <span class="team-member-number">02</span>
+        <div class="team-member-identity">
+          <h3 class="team-member-name">Thananwat</h3>
+          <p class="team-member-role">Backend Engineer</p>
+        </div>
+        <span class="team-member-status">Active</span>
+      </div>
+      <p class="team-member-focus"><strong>Focus</strong> Node.js API, Worker Threads, real-time data pipeline, WebSocket integration, database design, and server-side logic.</p>
+    </article>
+
+    <article class="team-member-card">
+      <div class="team-member-heading">
+        <span class="team-member-number">03</span>
+        <div class="team-member-identity">
+          <h3 class="team-member-name">Nuchvara</h3>
+          <p class="team-member-role">Data Analyst &amp; Product Manager</p>
+        </div>
+        <span class="team-member-status">Active</span>
+      </div>
+      <p class="team-member-focus"><strong>Focus</strong> GPS/GTFS data analysis, simulation testing and validation, documentation, presentations, stakeholder communication, and pilot coordination.</p>
+    </article>
+
+    <article class="team-member-card">
+      <div class="team-member-heading">
+        <span class="team-member-number">04</span>
+        <div class="team-member-identity">
+          <h3 class="team-member-name">Nattapong</h3>
+          <p class="team-member-role">Edge-AI &amp; Computer Vision Engineer</p>
+        </div>
+        <span class="team-member-status">Active</span>
+      </div>
+      <p class="team-member-focus"><strong>Focus</strong> YOLOv8-Nano passenger boarding/alighting counter, overhead camera integration, edge hardware setup, and model optimization.</p>
+    </article>
+
+    <article class="team-member-card">
+      <div class="team-member-heading">
+        <span class="team-member-number">05</span>
+        <div class="team-member-identity">
+          <h3 class="team-member-name">Paweenarin</h3>
+          <p class="team-member-role">Frontend Engineer &amp; UX/UI Designer</p>
+        </div>
+        <span class="team-member-status">Active</span>
+      </div>
+      <p class="team-member-focus"><strong>Focus</strong> React/Next.js Operator Dashboard, UI/UX design, data visualization, responsive layouts, user research, and usability testing.</p>
+    </article>
   </div>
 
-  <div class="highlight-box">
-    <strong>Why this role?</strong> Directly addresses the <strong>#1 constraint</strong> from Stage 3 — <em>Depot Access / Partnership</em>. A BD Lead with connections to BMTA ขสมก., Thai Smile Bus, university facility management, or EV concessionaires can unblock the critical gate to the 12-week pilot while the founder focuses on engineering.
+  <div class="team-note">
+    <strong>End-to-end team coverage</strong>
+    <span>The five members cover AI/ML, backend infrastructure, frontend experience, Edge-AI computer vision, and data/product management. This supports parallel development across Evenflow’s three core system layers.</span>
   </div>
 
-  <div class="source">Sources: [participant], [assumption]</div>
+  <div class="source">Sources: [participant]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s13" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s15" class="nav-btn nav-btn-primary">Next →</label>
@@ -1652,7 +1759,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 15: Timeline -->
 <div class="slide s15">
   <div class="slide-num">Slide 15 of 18 &middot; Timeline</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>Three-Ring Deployment Roadmap</h2>
 
   <div class="timeline-item">
@@ -1704,6 +1810,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </div>
 
   <div class="source">Sources: [participant]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s14" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s16" class="nav-btn nav-btn-primary">Next →</label>
@@ -1713,7 +1820,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 16: Key Risks & Mitigations -->
 <div class="slide s16">
   <div class="slide-num">Slide 16 of 18 &middot; Key Risks & Mitigations</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>Key Risks & Mitigations</h2>
 
   <div class="card" style="border-left: 3px solid var(--red);">
@@ -1774,6 +1880,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </div>
 
   <div class="source">Sources: [participant], [Manager Online transit labor reports], [APC Sensor Studies]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s15" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s17" class="nav-btn nav-btn-primary">Next →</label>
@@ -1783,7 +1890,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 17: Open Assumptions & Decision Log -->
 <div class="slide s17">
   <div class="slide-num">Slide 17 of 18 &middot; Assumptions & Decision Log</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <h2>Open Assumptions</h2>
   <p class="subtitle">All 3 assumptions reviewed and confirmed — 0 items remain unconfirmed</p>
 
@@ -1833,6 +1939,7 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
   </table>
 
   <div class="source">Sources: [participant], [user selection], [assumption]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s16" class="nav-btn nav-btn-secondary">← Back</label>
     <label for="s18" class="nav-btn nav-btn-primary">Next →</label>
@@ -1842,7 +1949,6 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
 <!-- SLIDE 18: Go / No-Go & Sources -->
 <div class="slide s18">
   <div class="slide-num">Slide 18 of 18 &middot; Go / No-Go & Evidence</div>
-  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
 
   <div class="verdict-box">
     <div style="font-size:48px; margin-bottom:8px;">✅</div>
@@ -1899,12 +2005,13 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
     <div style="font-size:36px; margin-bottom:8px;">🚍</div>
     <h2 style="margin-bottom:4px;">Evenflow</h2>
     <p style="font-size:14px; color:var(--text-secondary);">Real-Time AI Depot Dispatch & Headway Planning System</p>
-    <p style="font-size:13px; color:var(--text-muted); margin-top:8px;">AI for All Thailand Innovation Sprint 2026</p>
-    <p style="font-size:13px; color:var(--text-muted);">Bowornnan — Solo Founder</p>
-    <p style="font-size:12px; color:var(--accent); margin-top:8px;">ai-forall-eight.vercel.app &middot; github.com/Alicebbb111/AI-for-all</p>
+    <p style="font-size:13px; color:var(--text-muted); margin-top:8px;">AI For All Hackathon</p>
+    <p style="font-size:13px; color:var(--text-muted);">Team Moodengs</p>
+    <p style="font-size:12px; margin-top:8px;"><a href="https://ai-forall-eight.vercel.app/" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:underline;">ai-forall-eight.vercel.app</a> &middot; <a href="https://github.com/Alicebbb111/AI-for-all" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:underline;">github.com/Alicebbb111/AI-for-all</a></p>
   </div>
 
   <div class="source">Sources: [participant], [TDRI & OTP], [Daganzo 2009], [Drabicki et al. 2023], [Singapore LTA BSRF], [Manager Online], [Swiftly & Optibus benchmarks], [APC Sensor Studies], [PDPA B.E. 2562], [assumption]</div>
+  <div class="keyboard-hint">Keyboard tip: Press &larr; Left Arrow or Right Arrow &rarr; to navigate slides.</div>
   <div style="margin-top:16px; display:flex; gap:8px;">
     <label for="s17" class="nav-btn nav-btn-secondary">← Back</label>
   </div>
@@ -1927,6 +2034,13 @@ body.presentation-open #full-project { display: block; position: fixed; inset: 0
    history.pushState({view:"presentation"},"", "#full-project");
    showPresentation();
  }
+ var overviewBack=document.getElementById("overview-back-to-landing");
+ if(overviewBack){overviewBack.addEventListener("click",function(e){
+   e.preventDefault();
+   document.body.classList.remove("presentation-open");
+   history.replaceState({view:"landing"},"",location.pathname+location.search);
+   window.scrollTo({top:0,behavior:"auto"});
+ });}
  if(explore){explore.addEventListener("click",function(e){
    e.preventDefault();
    if(!document.body.classList.contains("presentation-open")){
